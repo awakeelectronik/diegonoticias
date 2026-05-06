@@ -6,12 +6,15 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
+	"github.com/awakeelectronik/diegonoticias/internal/ai"
 	"github.com/awakeelectronik/diegonoticias/internal/articles"
 	"github.com/awakeelectronik/diegonoticias/internal/auth"
 	"github.com/awakeelectronik/diegonoticias/internal/builder"
 	"github.com/awakeelectronik/diegonoticias/internal/config"
+	"github.com/awakeelectronik/diegonoticias/internal/ratelimit"
 )
 
 type Handler struct {
@@ -21,12 +24,20 @@ type Handler struct {
 	sitePublicDir string
 	builder       *builder.Builder
 	articleStore  *articles.Store
+	aiClient      *ai.Client
+	aiLimiter     *ratelimit.DailyLimiter
 }
 
 func New(cfg config.Config) *Handler {
 	siteDir := cfg.SiteDir
 	if siteDir == "" {
 		siteDir = "./site"
+	}
+	maxPerDay := 100
+	if raw := strings.TrimSpace(os.Getenv("GROQ_MAX_PER_DAY")); raw != "" {
+		if n, err := strconv.Atoi(raw); err == nil && n > 0 {
+			maxPerDay = n
+		}
 	}
 	return &Handler{
 		adminFilePath: filepath.Join(cfg.DataDir, "admin.json"),
@@ -35,6 +46,8 @@ func New(cfg config.Config) *Handler {
 		sitePublicDir: filepath.Join(siteDir, "public"),
 		builder:       builder.New(siteDir, cfg.HugoBin),
 		articleStore:  articles.NewStore(filepath.Join(siteDir, "content", "articulos")),
+		aiClient:      ai.New(),
+		aiLimiter:     ratelimit.NewDailyLimiter(maxPerDay),
 	}
 }
 
@@ -49,6 +62,7 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("POST /admin/api/articulos", h.csrfRequired(h.createArticle))
 	mux.HandleFunc("PUT /admin/api/articulos/{slug}", h.csrfRequired(h.updateArticle))
 	mux.HandleFunc("DELETE /admin/api/articulos/{slug}", h.csrfRequired(h.deleteArticle))
+	mux.HandleFunc("POST /admin/api/articulos/generar", h.csrfRequired(h.generateArticle))
 
 	mux.Handle("GET /admin/", h.adminSPAHandler())
 	mux.Handle("GET /", h.publicSiteHandler())

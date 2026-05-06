@@ -8,6 +8,7 @@ require (
 	github.com/gosimple/slug v1.15.0
 	github.com/joho/godotenv v1.5.1
 	golang.org/x/term v0.42.0
+	gopkg.in/yaml.v2 v2.3.0
 )
 
 require (
@@ -15,5 +16,4 @@ require (
 	github.com/gosimple/unidecode v1.0.1 // indirect
 	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/sys v0.43.0 // indirect
-	gopkg.in/yaml.v2 v2.3.0 // indirect
 )
