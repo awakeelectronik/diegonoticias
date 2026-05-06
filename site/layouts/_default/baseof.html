@@ -9,10 +9,12 @@
   </head>
   <body>
     {{ partial "header.html" . }}
-    <main class="mx-auto max-w-6xl px-4 py-8">
+    {{ partial "search.html" . }}
+    <main class="shell" style="padding-top: 8px; padding-bottom: 90px;">
       {{ block "main" . }}{{ end }}
     </main>
     {{ partial "footer.html" . }}
+    {{ partial "mobile-nav.html" . }}
   </body>
 </html>
 
