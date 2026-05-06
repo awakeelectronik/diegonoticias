@@ -120,6 +120,66 @@ func (c *Client) Stream(ctx context.Context, p GenerateParams, onDelta func(stri
 	return nil
 }
 
+// Complete llama a Groq sin streaming y devuelve el contenido JSON del mensaje.
+func (c *Client) Complete(ctx context.Context, p GenerateParams) (string, error) {
+	if c.apiKey == "" {
+		return "", errors.New("GROQ_API_KEY no configurada")
+	}
+	prompt, err := BuildPrompt(PromptData{
+		RawText:         p.RawText,
+		ToneID:          p.Tone,
+		ToneDescription: toneDescription(p.Tone),
+		TitleHint:       p.TitleHint,
+		HasImage:        p.HasImage,
+	})
+	if err != nil {
+		return "", err
+	}
+	body := map[string]any{
+		"model": c.model,
+		"messages": []map[string]string{
+			{"role": "system", "content": "Responde solo JSON válido."},
+			{"role": "user", "content": prompt},
+		},
+		"response_format": map[string]string{"type": "json_object"},
+		"temperature":     0.7,
+		"max_tokens":      1024,
+		"stream":          false,
+	}
+	payload, _ := json.Marshal(body)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://api.groq.com/openai/v1/chat/completions", bytes.NewReader(payload))
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Authorization", "Bearer "+c.apiKey)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+
+	resp, err := c.http.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return "", fmt.Errorf("Groq devolvió %s", resp.Status)
+	}
+
+	var out struct {
+		Choices []struct {
+			Message struct {
+				Content string `json:"content"`
+			} `json:"message"`
+		} `json:"choices"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&out); err != nil {
+		return "", err
+	}
+	if len(out.Choices) == 0 {
+		return "", errors.New("sin respuesta del modelo")
+	}
+	return strings.TrimSpace(out.Choices[0].Message.Content), nil
+}
+
 func toneDescription(tone string) string {
 	switch tone {
 	case "informativo":

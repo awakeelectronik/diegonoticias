@@ -18,6 +18,10 @@ func (h *Handler) generateArticle(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "JSON inválido"})
 		return
 	}
+	if r.URL.Query().Get("sync") == "1" {
+		h.generateArticleSync(w, r, req)
+		return
+	}
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
@@ -40,5 +44,25 @@ func (h *Handler) generateArticle(w http.ResponseWriter, r *http.Request) {
 	}
 	_, _ = w.Write([]byte("event: done\ndata: {}\n\n"))
 	f.Flush()
+}
+
+func (h *Handler) generateArticleSync(w http.ResponseWriter, r *http.Request, req ai.GenerateParams) {
+	raw, err := h.aiClient.Complete(r.Context(), req)
+	if err != nil {
+		writeJSON(w, http.StatusBadGateway, map[string]string{"error": "No se pudo generar el artículo"})
+		return
+	}
+	var out struct {
+		Title           string `json:"title"`
+		Body            string `json:"body"`
+		MetaDescription string `json:"metaDescription"`
+		Category        string `json:"category"`
+		ImageAlt        string `json:"imageAlt"`
+	}
+	if err := json.Unmarshal([]byte(raw), &out); err != nil {
+		writeJSON(w, http.StatusBadGateway, map[string]string{"error": "Respuesta de IA inválida"})
+		return
+	}
+	writeJSON(w, http.StatusOK, out)
 }
 

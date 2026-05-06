@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { parse, ALL } from 'partial-json'
-import { createArticle, getArticle, updateArticle } from '@/api/articles'
+import { createArticle, generateArticleSync, getArticle, updateArticle } from '@/api/articles'
 import ImageUpload from '@/components/ImageUpload.vue'
-import StreamingTextarea from '@/components/StreamingTextarea.vue'
-import { useSSE } from '@/composables/useSSE'
 import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
@@ -14,8 +11,7 @@ const auth = useAuthStore()
 const isEdit = computed(() => typeof route.params.slug === 'string')
 const error = ref('')
 const rawText = ref('')
-const streamBuffer = ref('')
-const sse = useSSE()
+const generating = ref(false)
 
 const form = ref({
   title: '',
@@ -29,8 +25,6 @@ const form = ref({
 })
 
 onMounted(async () => {
-  // Evita quedar "pegado" en estado de streaming al re-entrar a la vista.
-  sse.stop()
   if (!isEdit.value) return
   try {
     const item = await getArticle(String(route.params.slug))
@@ -49,10 +43,6 @@ onMounted(async () => {
   }
 })
 
-onBeforeUnmount(() => {
-  sse.stop()
-})
-
 async function onSave() {
   error.value = ''
   try {
@@ -69,35 +59,28 @@ async function onSave() {
 
 async function onGenerate() {
   error.value = ''
-  streamBuffer.value = ''
+  generating.value = true
   form.value.body = ''
-  await sse.start(
-    '/admin/api/articulos/generar',
-    { rawText: rawText.value, tone: form.value.tone, titleHint: form.value.title, hasImage: !!form.value.image },
-    (chunk) => {
-      streamBuffer.value += chunk
-      try {
-        const partial = parse(streamBuffer.value, ALL) as {
-          title?: string
-          body?: string
-          metaDescription?: string
-          category?: string
-          imageAlt?: string
-        }
-        if (partial.title) form.value.title = partial.title
-        if (partial.metaDescription) form.value.description = partial.metaDescription
-        if (partial.category) form.value.category = partial.category
-        if (partial.imageAlt) form.value.imageAlt = partial.imageAlt
-        if (partial.body) form.value.body = partial.body
-      } catch {
-        // partial-json puede fallar en chunks intermedios incompletos
-      }
-    },
-    () => {},
-    (msg) => {
-      error.value = msg
-    },
-  )
+  try {
+    const g = await generateArticleSync(
+      {
+        rawText: rawText.value,
+        tone: form.value.tone,
+        titleHint: form.value.title,
+        hasImage: !!form.value.image,
+      },
+      auth.csrfToken,
+    )
+    form.value.title = g.title
+    form.value.description = g.metaDescription
+    form.value.category = g.category
+    form.value.imageAlt = g.imageAlt
+    form.value.body = g.body
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'No se pudo generar'
+  } finally {
+    generating.value = false
+  }
 }
 </script>
 
@@ -111,23 +94,16 @@ async function onGenerate() {
       <input v-model="form.description" placeholder="Descripción" class="rounded-lg border border-neutral-300 px-3 py-2" />
       <input v-model="form.category" placeholder="Categoría" class="rounded-lg border border-neutral-300 px-3 py-2" />
       <ImageUpload v-model:imagePath="form.image" v-model:imageAlt="form.imageAlt" :image-path="form.image" :image-alt="form.imageAlt" />
-      <StreamingTextarea v-model="form.body" :streaming="sse.streaming" />
+      <textarea v-model="form.body" rows="12" placeholder="Cuerpo (markdown)" class="rounded-lg border border-neutral-300 px-3 py-2 font-mono text-sm" />
       <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
       <div class="flex gap-3">
         <button
           v-if="!isEdit"
-          class="rounded-lg bg-[var(--color-accent,#c8553d)] px-4 py-2 text-white"
-          :disabled="sse.streaming || !rawText.trim()"
+          class="rounded-lg bg-[var(--color-accent,#c8553d)] px-4 py-2 text-white disabled:opacity-50"
+          :disabled="generating || !rawText.trim()"
           @click="onGenerate"
         >
-          {{ sse.streaming ? 'Generando…' : 'Generar' }}
-        </button>
-        <button
-          v-if="!isEdit && sse.streaming"
-          class="rounded-lg border border-neutral-300 px-4 py-2"
-          @click="sse.stop"
-        >
-          Detener
+          {{ generating ? 'Generando…' : 'Generar' }}
         </button>
         <button class="rounded-lg bg-neutral-900 px-4 py-2 text-white" @click="onSave">Guardar</button>
         <router-link class="rounded-lg border border-neutral-300 px-4 py-2" to="/articulos">Cancelar</router-link>
@@ -135,4 +111,3 @@ async function onGenerate() {
     </div>
   </main>
 </template>
-

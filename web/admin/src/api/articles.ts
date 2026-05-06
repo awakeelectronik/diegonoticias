@@ -45,3 +45,22 @@ export function deleteArticle(slug: string, csrfToken: string) {
   })
 }
 
+export type GeneratedArticle = {
+  title: string
+  body: string
+  metaDescription: string
+  category: string
+  imageAlt: string
+}
+
+export function generateArticleSync(
+  payload: { rawText: string; tone: string; titleHint: string; hasImage: boolean },
+  csrfToken: string,
+) {
+  return apiFetch<GeneratedArticle>('/admin/api/articulos/generar?sync=1', {
+    method: 'POST',
+    headers: { 'X-CSRF-Token': csrfToken },
+    body: JSON.stringify(payload),
+  })
+}
+
