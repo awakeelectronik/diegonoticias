@@ -1,4 +1,9 @@
 <article class="card">
+  {{ if .Params.image }}
+    <div style="margin-bottom:10px;">
+      {{ partial "picture.html" (dict "base" .Params.image "alt" .Params.imageAlt "sizes" "(max-width: 900px) 100vw, 33vw") }}
+    </div>
+  {{ end }}
   <p class="mb-2 text-xs uppercase tracking-wide text-neutral-500">{{ .Params.category }}</p>
   <h3 class="mb-2 text-xl font-semibold"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
   <p class="line-clamp-3 text-neutral-700">{{ .Params.description }}</p>

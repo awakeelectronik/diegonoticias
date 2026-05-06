@@ -3,9 +3,14 @@ import { apiFetch } from '@/api/client'
 export type Article = {
   title: string
   slug: string
+  date?: string
   description: string
   tone: string
   category: string
+  image?: string
+  imageAlt?: string
+  draft?: boolean
+  wordCount?: number
   body: string
 }
 

@@ -2,6 +2,11 @@
   <article class="mx-auto max-w-3xl">
     <p class="mb-2 text-sm text-neutral-500">{{ .Date.Format "02 Jan 2006" }}</p>
     <h1 class="mb-6 text-4xl font-semibold">{{ .Title }}</h1>
+    {{ if .Params.image }}
+      <div style="margin-bottom:20px;">
+        {{ partial "picture.html" (dict "base" .Params.image "alt" .Params.imageAlt "loading" "eager" "priority" "high" "sizes" "(max-width: 900px) 100vw, 900px") }}
+      </div>
+    {{ end }}
     <div class="prose prose-neutral max-w-none">
       {{ .Content }}
     </div>

@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { parse, ALL } from 'partial-json'
 import { createArticle, getArticle, updateArticle } from '@/api/articles'
+import ImageUpload from '@/components/ImageUpload.vue'
 import StreamingTextarea from '@/components/StreamingTextarea.vue'
 import { useSSE } from '@/composables/useSSE'
 import { useAuthStore } from '@/stores/auth'
@@ -22,6 +23,8 @@ const form = ref({
   description: '',
   tone: 'informativo',
   category: 'general',
+  image: '',
+  imageAlt: '',
   body: '',
 })
 
@@ -35,6 +38,8 @@ onMounted(async () => {
       description: item.description,
       tone: item.tone,
       category: item.category,
+      image: item.image ?? '',
+      imageAlt: item.imageAlt ?? '',
       body: item.body,
     }
   } catch (e) {
@@ -62,7 +67,7 @@ async function onGenerate() {
   form.value.body = ''
   await sse.start(
     '/admin/api/articulos/generar',
-    { rawText: rawText.value, tone: form.value.tone, titleHint: form.value.title, hasImage: false },
+    { rawText: rawText.value, tone: form.value.tone, titleHint: form.value.title, hasImage: !!form.value.image },
     (chunk) => {
       streamBuffer.value += chunk
       try {
@@ -76,6 +81,7 @@ async function onGenerate() {
         if (partial.title) form.value.title = partial.title
         if (partial.metaDescription) form.value.description = partial.metaDescription
         if (partial.category) form.value.category = partial.category
+        if (partial.imageAlt) form.value.imageAlt = partial.imageAlt
         if (partial.body) form.value.body = partial.body
       } catch {
         // partial-json puede fallar en chunks intermedios incompletos
@@ -98,6 +104,7 @@ async function onGenerate() {
       <input v-model="form.slug" placeholder="Slug (opcional al crear)" class="rounded-lg border border-neutral-300 px-3 py-2" />
       <input v-model="form.description" placeholder="Descripción" class="rounded-lg border border-neutral-300 px-3 py-2" />
       <input v-model="form.category" placeholder="Categoría" class="rounded-lg border border-neutral-300 px-3 py-2" />
+      <ImageUpload v-model:imagePath="form.image" v-model:imageAlt="form.imageAlt" :image-path="form.image" :image-alt="form.imageAlt" />
       <StreamingTextarea v-model="form.body" :streaming="sse.streaming" />
       <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
       <div class="flex gap-3">

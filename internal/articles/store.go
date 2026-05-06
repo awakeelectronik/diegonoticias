@@ -77,6 +77,7 @@ func (s *Store) Create(a *Article) error {
 	if a.Date.IsZero() {
 		a.Date = time.Now()
 	}
+	a.WordCount = len(strings.Fields(a.Body))
 	return s.writeFile(a.Slug, a)
 }
 
@@ -90,6 +91,7 @@ func (s *Store) Update(slug string, a *Article) error {
 	if a.Date.IsZero() {
 		a.Date = time.Now()
 	}
+	a.WordCount = len(strings.Fields(a.Body))
 	if err := s.writeFile(a.Slug, a); err != nil {
 		return err
 	}

@@ -5,6 +5,7 @@ go 1.25.0
 require (
 	github.com/adrg/frontmatter v0.2.0
 	github.com/alexedwards/argon2id v1.0.0
+	github.com/davidbyttow/govips/v2 v2.18.0
 	github.com/gosimple/slug v1.15.0
 	github.com/joho/godotenv v1.5.1
 	golang.org/x/term v0.42.0
@@ -13,9 +14,8 @@ require (
 
 require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
-	github.com/davidbyttow/govips v0.0.0-20201026223743-b1b72c7305d9 // indirect
-	github.com/davidbyttow/govips/v2 v2.18.0 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect
+	github.com/kr/text v0.1.0 // indirect
 	golang.org/x/crypto v0.49.0 // indirect
 	golang.org/x/image v0.38.0 // indirect
 	golang.org/x/net v0.52.0 // indirect

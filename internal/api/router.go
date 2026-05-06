@@ -14,6 +14,7 @@ import (
 	"github.com/awakeelectronik/diegonoticias/internal/auth"
 	"github.com/awakeelectronik/diegonoticias/internal/builder"
 	"github.com/awakeelectronik/diegonoticias/internal/config"
+	"github.com/awakeelectronik/diegonoticias/internal/images"
 	"github.com/awakeelectronik/diegonoticias/internal/ratelimit"
 	"github.com/awakeelectronik/diegonoticias/internal/settings"
 )
@@ -26,6 +27,8 @@ type Handler struct {
 	builder       *builder.Builder
 	articleStore  *articles.Store
 	settingsStore *settings.Store
+	imagePipeline *images.Pipeline
+	uploadsDir    string
 	aiClient      *ai.Client
 	aiLimiter     *ratelimit.DailyLimiter
 }
@@ -49,6 +52,8 @@ func New(cfg config.Config) *Handler {
 		builder:       builder.New(siteDir, cfg.HugoBin),
 		articleStore:  articles.NewStore(filepath.Join(siteDir, "content", "articulos")),
 		settingsStore: settings.New(filepath.Join(cfg.DataDir, "settings.json")),
+		imagePipeline: images.NewPipeline(images.Config{UploadsRoot: cfg.UploadsDir}),
+		uploadsDir:    cfg.UploadsDir,
 		aiClient:      ai.New(),
 		aiLimiter:     ratelimit.NewDailyLimiter(maxPerDay),
 	}
@@ -66,10 +71,12 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("PUT /admin/api/articulos/{slug}", h.csrfRequired(h.updateArticle))
 	mux.HandleFunc("DELETE /admin/api/articulos/{slug}", h.csrfRequired(h.deleteArticle))
 	mux.HandleFunc("POST /admin/api/articulos/generar", h.csrfRequired(h.generateArticle))
+	mux.HandleFunc("POST /admin/api/imagenes", h.csrfRequired(h.uploadImage))
 	mux.HandleFunc("GET /admin/api/ajustes", h.authRequired(h.getSettings))
 	mux.HandleFunc("PUT /admin/api/ajustes", h.csrfRequired(h.updateSettings))
 
 	mux.Handle("GET /admin/", h.adminSPAHandler())
+	mux.Handle("GET /images/", h.imagesHandler())
 	mux.Handle("GET /", h.publicSiteHandler())
 	mux.Handle("GET /articulos/", h.publicSiteHandler())
 
@@ -145,5 +152,17 @@ func (h *Handler) publicSiteHandler() http.Handler {
 		}
 		http.NotFound(w, r)
 	})
+}
+
+func (h *Handler) imagesHandler() http.Handler {
+	fileHandler := http.StripPrefix("/images/", http.FileServer(http.Dir(filepath.Join(h.uploadsDir, "images"))))
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+		fileHandler.ServeHTTP(w, r)
+	})
+}
+
+func (h *Handler) imagePipelineMaxBytes() int64 {
+	return 8 * 1024 * 1024
 }
 
