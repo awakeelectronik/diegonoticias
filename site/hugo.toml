@@ -1,0 +1,22 @@
+baseURL = "https://diegonoticias.com/"
+languageCode = "es-CO"
+defaultContentLanguage = "es"
+title = "Diego Noticias"
+enableRobotsTXT = true
+summaryLength = 30
+
+[permalinks]
+articulos = "/:slug/"
+
+[markup.goldmark.renderer]
+unsafe = true
+
+[outputs]
+home = ["HTML", "RSS"]
+section = ["HTML", "RSS"]
+
+[minify]
+minifyOutput = true
+
+[pagination]
+pagerSize = 12

@@ -3,6 +3,7 @@ site/public/
 web/admin/dist/
 diegonoticias
 build/
+tools/
 
 # Runtime data
 data/

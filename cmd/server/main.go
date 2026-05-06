@@ -33,6 +33,10 @@ func main() {
 	slog.SetDefault(logger)
 
 	handler := api.New(cfg)
+	if err := handler.BuildInitialIfNeeded(); err != nil {
+		slog.Error("falló build inicial de Hugo", "error", err)
+		os.Exit(1)
+	}
 
 	srv := &http.Server{
 		Addr:              cfg.Listen,

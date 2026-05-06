@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="es-CO">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    {{ partial "head/meta.html" . }}
+    {{ $css := resources.Get "css/main.css" | minify | fingerprint }}
+    <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+  </head>
+  <body>
+    {{ partial "header.html" . }}
+    <main class="mx-auto max-w-6xl px-4 py-8">
+      {{ block "main" . }}{{ end }}
+    </main>
+    {{ partial "footer.html" . }}
+  </body>
+</html>
+

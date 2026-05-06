@@ -1,0 +1,18 @@
+{{ define "main" }}
+  {{ $p := .Paginate (where .Site.RegularPages "Section" "articulos") }}
+  {{ with index $p.Pages 0 }}
+    <section class="mb-8 rounded-2xl bg-white p-6">
+      <p class="text-sm text-neutral-500">{{ .Params.category }}</p>
+      <h2 class="mb-3 text-4xl font-semibold">{{ .Title }}</h2>
+      <p class="mb-4 text-neutral-700">{{ .Params.description }}</p>
+      <a class="text-[var(--color-accent)] underline" href="{{ .RelPermalink }}">Leer articulo</a>
+    </section>
+  {{ end }}
+  <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    {{ range after 1 $p.Pages }}
+      {{ partial "article-card.html" . }}
+    {{ end }}
+  </div>
+  {{ partial "pagination.html" . }}
+{{ end }}
+

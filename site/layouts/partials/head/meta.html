@@ -1,0 +1,3 @@
+<title>{{ if .IsHome }}Diego Noticias{{ else }}{{ .Title }} · Diego Noticias{{ end }}</title>
+<meta name="description" content="{{ with .Params.description }}{{ . }}{{ else }}Noticias breves y al grano.{{ end }}">
+<link rel="canonical" href="{{ .Permalink }}">

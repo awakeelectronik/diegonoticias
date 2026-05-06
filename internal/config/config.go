@@ -14,6 +14,8 @@ type Config struct {
 	Env      string
 	Listen   string
 	DataDir  string
+	SiteDir  string
+	HugoBin  string
 	LogLevel slog.Level
 }
 
@@ -35,6 +37,14 @@ func Load() (Config, error) {
 	if dataDir == "" {
 		dataDir = "./data"
 	}
+	siteDir := strings.TrimSpace(os.Getenv("DN_SITE_DIR"))
+	if siteDir == "" {
+		siteDir = "./site"
+	}
+	hugoBin := strings.TrimSpace(os.Getenv("DN_HUGO_BIN"))
+	if hugoBin == "" {
+		hugoBin = "hugo"
+	}
 
 	levelStr := strings.TrimSpace(os.Getenv("DN_LOG_LEVEL"))
 	if levelStr == "" {
@@ -50,6 +60,8 @@ func Load() (Config, error) {
 		Env:      env,
 		Listen:   listen,
 		DataDir:  dataDir,
+		SiteDir:  siteDir,
+		HugoBin:  hugoBin,
 		LogLevel: level,
 	}, nil
 }

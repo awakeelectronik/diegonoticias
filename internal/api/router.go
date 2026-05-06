@@ -2,13 +2,14 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/awakeelectronik/diegonoticias/internal/auth"
+	"github.com/awakeelectronik/diegonoticias/internal/builder"
 	"github.com/awakeelectronik/diegonoticias/internal/config"
 )
 
@@ -16,13 +17,21 @@ type Handler struct {
 	adminFilePath string
 	sessions      *auth.SessionManager
 	adminDistDir  string
+	sitePublicDir string
+	builder       *builder.Builder
 }
 
 func New(cfg config.Config) *Handler {
+	siteDir := cfg.SiteDir
+	if siteDir == "" {
+		siteDir = "./site"
+	}
 	return &Handler{
 		adminFilePath: filepath.Join(cfg.DataDir, "admin.json"),
 		sessions:      auth.NewSessionManager(auth.SessionTTL()),
 		adminDistDir:  filepath.Join("web", "admin", "dist"),
+		sitePublicDir: filepath.Join(siteDir, "public"),
+		builder:       builder.New(siteDir, cfg.HugoBin),
 	}
 }
 
@@ -37,12 +46,21 @@ func (h *Handler) Routes() http.Handler {
 	}))
 
 	mux.Handle("GET /admin/", h.adminSPAHandler())
-	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		_, _ = w.Write([]byte("<h1>Diego Noticias</h1>"))
-	})
+	mux.Handle("GET /", h.publicSiteHandler())
+	mux.Handle("GET /articulos/", h.publicSiteHandler())
 
 	return securityHeaders(loggingMiddleware(mux))
+}
+
+func (h *Handler) BuildInitialIfNeeded() error {
+	if _, err := os.Stat(filepath.Join(h.sitePublicDir, "index.html")); err == nil {
+		return nil
+	}
+	res := h.builder.Build()
+	if res.Status == "error" {
+		return errors.New(res.Error)
+	}
+	return nil
 }
 
 func (h *Handler) adminSPAHandler() http.Handler {
@@ -85,7 +103,23 @@ func securityHeaders(next http.Handler) http.Handler {
 	})
 }
 
-func SessionMaxAge(ttl time.Duration) int {
-	return int(ttl.Seconds())
+func (h *Handler) publicSiteHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		rel := filepath.Clean("/" + r.URL.Path)
+		target := filepath.Join(h.sitePublicDir, rel)
+		if fi, err := os.Stat(target); err == nil && fi.IsDir() {
+			target = filepath.Join(target, "index.html")
+		}
+		if fi, err := os.Stat(target); err == nil && !fi.IsDir() {
+			if strings.HasSuffix(target, ".html") {
+				w.Header().Set("Cache-Control", "no-cache")
+			} else {
+				w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+			}
+			http.ServeFile(w, r, target)
+			return
+		}
+		http.NotFound(w, r)
+	})
 }
 
