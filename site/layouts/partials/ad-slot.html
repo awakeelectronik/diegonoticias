@@ -11,9 +11,9 @@
 {{- else -}}
   {{- range site.Data.ads.banners -}}
     {{- if eq .slot $slot -}}
-      <a class="card" style="display:block; margin:24px 0;" href="{{ .linkUrl }}" rel="sponsored noopener" target="_blank">
+      <div class="card" style="display:block; margin:24px 0;">
         {{ partial "picture.html" (dict "base" .imagePath "alt" .title "loading" "lazy") }}
-      </a>
+      </div>
     {{- end -}}
   {{- end -}}
 {{- end -}}

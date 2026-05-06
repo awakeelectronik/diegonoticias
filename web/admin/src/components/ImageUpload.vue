@@ -6,6 +6,8 @@ import { useAuthStore } from '@/stores/auth'
 const props = defineProps<{
   imagePath: string
   imageAlt: string
+  /** Si es true, no se muestra el campo de texto para el alt (p. ej. publicidad: se usa solo el título). */
+  hideAltField?: boolean
 }>()
 const emit = defineEmits<{
   (e: 'update:imagePath', value: string): void
@@ -41,6 +43,7 @@ async function onFileChange(ev: Event) {
     <p v-if="uploading" class="text-sm text-neutral-500">Procesando imagen…</p>
     <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
     <input
+      v-if="!hideAltField"
       :value="imageAlt"
       class="rounded-lg border border-neutral-300 px-3 py-2"
       placeholder="Alt de imagen"

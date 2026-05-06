@@ -50,6 +50,25 @@ a {
   font-size: 34px;
   font-weight: 600;
   letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.brand-diego,
+.brand-noticias {
+  color: #fff;
+  display: inline-block;
+  padding: 0.12em 0.28em;
+}
+
+.brand-diego {
+  font-weight: 700;
+  background: #9ec5e8;
+  border-radius: 6px 0 0 6px;
+}
+
+.brand-noticias {
+  background: #f0a8a8;
+  border-radius: 0 6px 6px 0;
 }
 
 .hero {
@@ -80,6 +99,98 @@ a {
   padding: 16px;
   border: 1px solid #ece6de;
   box-shadow: 0 2px 10px rgba(35, 24, 14, 0.04);
+}
+
+.card--tagged {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+
+.card-category-rail {
+  flex: 0 0 auto;
+  width: 2.75rem;
+  background: linear-gradient(165deg, #f2ede6 0%, #e5dfd4 100%);
+  border-right: 1px solid #e0d8cf;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 0;
+  border-radius: 18px 0 0 18px;
+}
+
+.card-category-label {
+  display: block;
+  max-height: 11rem;
+  overflow: hidden;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #6b655c;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  text-align: center;
+  line-height: 1.2;
+  padding: 6px 0;
+  border-top: 1px solid rgba(107, 101, 92, 0.2);
+  border-bottom: 1px solid rgba(107, 101, 92, 0.2);
+}
+
+.card-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.card--tagged .card-main {
+  padding: 16px;
+}
+
+.card-thumb {
+  margin-bottom: 10px;
+}
+
+.card-title {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.card-excerpt {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: #4f4b47;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.hero-category {
+  margin: 0 0 6px;
+}
+
+.hero-category-inner {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #5c574f;
+  background: linear-gradient(180deg, #f4f0ea 0%, #ebe4da 100%);
+  border: 1px solid #ded6cc;
+  border-radius: 999px;
+  padding: 6px 14px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
 .mobile-nav {
@@ -116,5 +227,99 @@ a {
     color: #3a3a3a;
     padding: 6px 0;
   }
+}
+
+.site-footer {
+  margin-top: 3.5rem;
+  border-top: 1px solid #e9e2d9;
+  padding: 2rem 0 2.5rem;
+}
+
+.site-footer-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.site-footer-copy {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+.site-footer-social {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.site-footer-social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid #ece6de;
+  color: var(--color-fg);
+  box-shadow: 0 2px 10px rgba(35, 24, 14, 0.06);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.site-footer-social-link:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(35, 24, 14, 0.1);
+  border-color: #ddd5cb;
+}
+
+.site-footer-social-link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.site-footer-social-link svg {
+  width: 20px;
+  height: 20px;
+}
+
+.site-footer-social-link--facebook:hover {
+  color: #fff;
+  background: #1877f2;
+  border-color: #1877f2;
+}
+
+.site-footer-social-link--instagram:hover {
+  color: #fff;
+  background: linear-gradient(
+    200deg,
+    #f09433 0%,
+    #e6683c 25%,
+    #dc2743 50%,
+    #cc2366 75%,
+    #bc1888 100%
+  );
+  border-color: #dc2743;
+}
+
+.site-footer-social-link--x:hover {
+  color: #fff;
+  background: #000;
+  border-color: #000;
 }
 

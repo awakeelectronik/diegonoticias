@@ -4,7 +4,6 @@ export type Banner = {
   id: string
   title: string
   imagePath: string
-  linkUrl: string
   active: boolean
   slot: number
 }

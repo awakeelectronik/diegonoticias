@@ -2,7 +2,6 @@ package ads
 
 import (
 	"fmt"
-	"net/url"
 	"strings"
 )
 
@@ -12,10 +11,6 @@ func Validate(b Banner, all []Banner, updatingID string) error {
 	}
 	if b.Slot != 1 && b.Slot != 2 {
 		return fmt.Errorf("%w: slot inválido", ErrInvalid)
-	}
-	u, err := url.Parse(b.LinkURL)
-	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {
-		return fmt.Errorf("%w: linkUrl debe ser URL absoluta http(s)", ErrInvalid)
 	}
 	if strings.TrimSpace(b.ImagePath) == "" {
 		return fmt.Errorf("%w: imagePath requerido", ErrInvalid)

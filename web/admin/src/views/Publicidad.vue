@@ -26,7 +26,7 @@ async function onDelete(id: string) {
 </script>
 
 <template>
-  <main class="min-h-screen p-6">
+  <main class="flex min-h-screen flex-col p-6">
     <header class="mb-6 flex items-center justify-between">
       <h1 class="text-2xl font-semibold">Publicidad</h1>
       <router-link class="rounded-lg bg-neutral-900 px-4 py-2 text-white" to="/publicidad/nueva">Nuevo banner</router-link>
@@ -46,6 +46,11 @@ async function onDelete(id: string) {
         </div>
       </li>
     </ul>
+    <div class="mt-auto border-t border-neutral-200 pt-6">
+      <router-link class="inline-flex rounded-lg border border-neutral-300 px-4 py-2 text-sm text-neutral-800" to="/">
+        ← Inicio
+      </router-link>
+    </div>
   </main>
 </template>
 

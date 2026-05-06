@@ -24,6 +24,8 @@ const form = ref({
   body: '',
 })
 
+const imageAltForUpload = computed(() => form.value.title.trim() || 'Imagen de la noticia')
+
 onMounted(async () => {
   if (!isEdit.value) return
   try {
@@ -49,7 +51,7 @@ async function onSave() {
     if (isEdit.value) {
       await updateArticle(String(route.params.slug), form.value, auth.csrfToken)
     } else {
-      await createArticle(form.value, auth.csrfToken)
+      await createArticle({ ...form.value, slug: '' }, auth.csrfToken)
     }
     await router.push('/articulos')
   } catch (e) {
@@ -87,16 +89,24 @@ async function onGenerate() {
 <template>
   <main class="min-h-screen p-6">
     <h1 class="mb-6 text-2xl font-semibold">{{ isEdit ? 'Editar artículo' : 'Nuevo artículo' }}</h1>
-    <div class="grid gap-4">
-      <textarea v-model="rawText" rows="5" placeholder="Texto crudo para IA" class="rounded-lg border border-neutral-300 px-3 py-2" />
+    <div class="grid max-w-2xl gap-4">
+      <textarea
+        v-if="!isEdit"
+        v-model="rawText"
+        rows="5"
+        placeholder="Texto crudo para IA"
+        class="rounded-lg border border-neutral-300 px-3 py-2"
+      />
       <input v-model="form.title" placeholder="Título" class="rounded-lg border border-neutral-300 px-3 py-2" />
-      <input v-model="form.slug" placeholder="Slug (opcional al crear)" class="rounded-lg border border-neutral-300 px-3 py-2" />
-      <input v-model="form.description" placeholder="Descripción" class="rounded-lg border border-neutral-300 px-3 py-2" />
-      <input v-model="form.category" placeholder="Categoría" class="rounded-lg border border-neutral-300 px-3 py-2" />
-      <ImageUpload v-model:imagePath="form.image" v-model:imageAlt="form.imageAlt" :image-path="form.image" :image-alt="form.imageAlt" />
-      <textarea v-model="form.body" rows="12" placeholder="Cuerpo (markdown)" class="rounded-lg border border-neutral-300 px-3 py-2 font-mono text-sm" />
+      <ImageUpload
+        v-model:imagePath="form.image"
+        hide-alt-field
+        :image-path="form.image"
+        :image-alt="imageAltForUpload"
+        @update:imageAlt="(v) => { form.imageAlt = v }"
+      />
       <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
-      <div class="flex gap-3">
+      <div class="flex flex-wrap gap-3">
         <button
           v-if="!isEdit"
           class="rounded-lg bg-[var(--color-accent,#c8553d)] px-4 py-2 text-white disabled:opacity-50"

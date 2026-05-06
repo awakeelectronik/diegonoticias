@@ -14,7 +14,6 @@ type Banner struct {
 	ID        string    `json:"id" toml:"id"`
 	Title     string    `json:"title" toml:"title"`
 	ImagePath string    `json:"imagePath" toml:"imagePath"`
-	LinkURL   string    `json:"linkUrl" toml:"linkUrl"`
 	Active    bool      `json:"active" toml:"active"`
 	Slot      int       `json:"slot" toml:"slot"`
 	CreatedAt time.Time `json:"createdAt" toml:"createdAt"`

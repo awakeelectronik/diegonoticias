@@ -4,7 +4,7 @@ dev:
 	./scripts/dev.sh
 
 build:
-	go build -o diegonoticias ./cmd/server
+	CGO_ENABLED=1 go build -tags vips -o diegonoticias ./cmd/server
 
 test:
 	go test ./...
