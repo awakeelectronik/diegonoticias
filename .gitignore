@@ -1,0 +1,24 @@
+# Build outputs
+site/public/
+web/admin/dist/
+diegonoticias
+build/
+
+# Runtime data
+data/
+static-uploads/
+*.log
+
+# Node/Vite
+node_modules/
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Secrets
+.env
+*.local
+
