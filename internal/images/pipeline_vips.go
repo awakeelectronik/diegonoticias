@@ -18,10 +18,13 @@ func processWithVips(input []byte, diskBase string, cfg Config) error {
 	defer img.Close()
 	img.RemoveMetadata()
 	origW := img.Width()
+	if origW < 1 {
+		return fmt.Errorf("ancho de imagen inválido")
+	}
+	// Siempre generamos cada tamaño de cfg.Sizes (p. ej. 320, 640…): si el original es
+	// más estrecho que 320px, antes se omitían todos los tamaños y no se escribía ningún
+	// archivo aunque la API devolvía basePath. Aquí escalamos hacia arriba cuando hace falta.
 	for _, w := range cfg.Sizes {
-		if w > origW {
-			continue
-		}
 		scale := float64(w) / float64(origW)
 		thumb, err := img.Copy()
 		if err != nil {

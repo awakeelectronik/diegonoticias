@@ -26,6 +26,14 @@ const form = ref({
 
 const imageAltForUpload = computed(() => form.value.title.trim() || 'Imagen de la noticia')
 
+function onImagePathUpdate(path: string) {
+  form.value.image = path
+}
+
+function onImageAltUpdate(alt: string) {
+  form.value.imageAlt = alt
+}
+
 onMounted(async () => {
   if (!isEdit.value) return
   try {
@@ -99,11 +107,11 @@ async function onGenerate() {
       />
       <input v-model="form.title" placeholder="Título" class="rounded-lg border border-neutral-300 px-3 py-2" />
       <ImageUpload
-        v-model:imagePath="form.image"
         hide-alt-field
         :image-path="form.image"
         :image-alt="imageAltForUpload"
-        @update:imageAlt="(v) => { form.imageAlt = v }"
+        @update:imagePath="onImagePathUpdate"
+        @update:imageAlt="onImageAltUpdate"
       />
       <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
       <div class="flex flex-wrap gap-3">

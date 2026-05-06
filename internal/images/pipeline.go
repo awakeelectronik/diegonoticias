@@ -54,6 +54,11 @@ func (p *Pipeline) ProcessArticleImage(input []byte) (string, error) {
 	if err := processWithVips(input, diskBase, p.cfg); err != nil {
 		return "", err
 	}
+	smallest := p.cfg.Sizes[0]
+	check := fmt.Sprintf("%s-%d.webp", diskBase, smallest)
+	if _, err := os.Stat(check); err != nil {
+		return "", fmt.Errorf("pipeline no generó variantes (%s): %w", check, err)
+	}
 	return "/" + base, nil
 }
 
