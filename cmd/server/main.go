@@ -11,6 +11,7 @@ import (
 
 	"github.com/awakeelectronik/diegonoticias/internal/api"
 	"github.com/awakeelectronik/diegonoticias/internal/config"
+	"github.com/awakeelectronik/diegonoticias/internal/images"
 )
 
 func main() {
@@ -31,6 +32,13 @@ func main() {
 
 	logger := newLogger(cfg)
 	slog.SetDefault(logger)
+
+	shutdownImages, err := images.InitRuntime()
+	if err != nil {
+		slog.Error("falló inicialización de runtime de imágenes", "error", err)
+		os.Exit(1)
+	}
+	defer shutdownImages()
 
 	handler := api.New(cfg)
 	if err := handler.BuildInitialIfNeeded(); err != nil {
