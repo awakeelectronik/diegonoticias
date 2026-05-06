@@ -13,6 +13,7 @@ import (
 type Config struct {
 	Env      string
 	Listen   string
+	DataDir  string
 	LogLevel slog.Level
 }
 
@@ -30,6 +31,10 @@ func Load() (Config, error) {
 	if listen == "" {
 		listen = "127.0.0.1:8080"
 	}
+	dataDir := strings.TrimSpace(os.Getenv("DN_DATA_DIR"))
+	if dataDir == "" {
+		dataDir = "./data"
+	}
 
 	levelStr := strings.TrimSpace(os.Getenv("DN_LOG_LEVEL"))
 	if levelStr == "" {
@@ -44,6 +49,7 @@ func Load() (Config, error) {
 	return Config{
 		Env:      env,
 		Listen:   listen,
+		DataDir:  dataDir,
 		LogLevel: level,
 	}, nil
 }

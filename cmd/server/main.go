@@ -9,10 +9,20 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/awakeelectronik/diegonoticias/internal/api"
 	"github.com/awakeelectronik/diegonoticias/internal/config"
 )
 
 func main() {
+	cmd := ""
+	if len(os.Args) > 1 {
+		cmd = os.Args[1]
+	}
+	if cmd == "setup-admin" {
+		runSetupAdmin()
+		return
+	}
+
 	cfg, err := config.Load()
 	if err != nil {
 		slog.Error("config inválida", "error", err)
@@ -22,15 +32,11 @@ func main() {
 	logger := newLogger(cfg)
 	slog.SetDefault(logger)
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		_, _ = w.Write([]byte("<h1>Diego Noticias</h1>"))
-	})
+	handler := api.New(cfg)
 
 	srv := &http.Server{
 		Addr:              cfg.Listen,
-		Handler:           mux,
+		Handler:           handler.Routes(),
 		ReadHeaderTimeout: 10 * time.Second,
 		IdleTimeout:       120 * time.Second,
 	}
