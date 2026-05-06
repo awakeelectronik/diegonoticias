@@ -1,6 +1,5 @@
 # Build outputs
 site/public/
-web/admin/dist/
 diegonoticias
 build/
 tools/
