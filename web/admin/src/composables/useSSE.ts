@@ -55,6 +55,8 @@ export function useSSE() {
 
   function stop() {
     controller?.abort()
+    controller = null
+    streaming.value = false
   }
 
   return { streaming, start, stop }
