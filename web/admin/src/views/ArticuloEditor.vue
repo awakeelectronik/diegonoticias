@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { parse, ALL } from 'partial-json'
 import { createArticle, getArticle, updateArticle } from '@/api/articles'
@@ -29,6 +29,8 @@ const form = ref({
 })
 
 onMounted(async () => {
+  // Evita quedar "pegado" en estado de streaming al re-entrar a la vista.
+  sse.stop()
   if (!isEdit.value) return
   try {
     const item = await getArticle(String(route.params.slug))
@@ -45,6 +47,10 @@ onMounted(async () => {
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'No se pudo cargar'
   }
+})
+
+onBeforeUnmount(() => {
+  sse.stop()
 })
 
 async function onSave() {
