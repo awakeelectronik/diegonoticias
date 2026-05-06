@@ -2,12 +2,15 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import LoginView from '@/views/Login.vue'
 import ArticulosView from '@/views/Articulos.vue'
+import ArticuloEditorView from '@/views/ArticuloEditor.vue'
 
 export const router = createRouter({
   history: createWebHistory('/admin/'),
   routes: [
     { path: '/login', component: LoginView },
     { path: '/articulos', component: ArticulosView },
+    { path: '/articulos/nuevo', component: ArticuloEditorView },
+    { path: '/articulos/:slug/editar', component: ArticuloEditorView },
     { path: '/', redirect: '/articulos' },
   ],
 })

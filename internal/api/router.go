@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/awakeelectronik/diegonoticias/internal/articles"
 	"github.com/awakeelectronik/diegonoticias/internal/auth"
 	"github.com/awakeelectronik/diegonoticias/internal/builder"
 	"github.com/awakeelectronik/diegonoticias/internal/config"
@@ -19,6 +20,7 @@ type Handler struct {
 	adminDistDir  string
 	sitePublicDir string
 	builder       *builder.Builder
+	articleStore  *articles.Store
 }
 
 func New(cfg config.Config) *Handler {
@@ -32,6 +34,7 @@ func New(cfg config.Config) *Handler {
 		adminDistDir:  filepath.Join("web", "admin", "dist"),
 		sitePublicDir: filepath.Join(siteDir, "public"),
 		builder:       builder.New(siteDir, cfg.HugoBin),
+		articleStore:  articles.NewStore(filepath.Join(siteDir, "content", "articulos")),
 	}
 }
 
@@ -41,9 +44,11 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("POST /admin/api/login", h.login)
 	mux.HandleFunc("GET /admin/api/me", h.authRequired(h.me))
 	mux.HandleFunc("POST /admin/api/logout", h.csrfRequired(h.logout))
-	mux.HandleFunc("GET /admin/api/articulos", h.authRequired(func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(w, http.StatusOK, map[string]string{"message": "Hola, diego"})
-	}))
+	mux.HandleFunc("GET /admin/api/articulos", h.authRequired(h.listArticles))
+	mux.HandleFunc("GET /admin/api/articulos/{slug}", h.authRequired(h.getArticle))
+	mux.HandleFunc("POST /admin/api/articulos", h.csrfRequired(h.createArticle))
+	mux.HandleFunc("PUT /admin/api/articulos/{slug}", h.csrfRequired(h.updateArticle))
+	mux.HandleFunc("DELETE /admin/api/articulos/{slug}", h.csrfRequired(h.deleteArticle))
 
 	mux.Handle("GET /admin/", h.adminSPAHandler())
 	mux.Handle("GET /", h.publicSiteHandler())
