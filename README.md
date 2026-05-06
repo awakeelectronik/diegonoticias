@@ -8,6 +8,8 @@ Sitio minimalista de noticias con:
 ## Requisitos (dev)
 
 - Go 1.23+
+- Node 22+
+- Hugo extended 0.140+
 
 ## libvips y ahorro de RAM
 
@@ -40,4 +42,22 @@ make dev
 ```bash
 curl -i http://127.0.0.1:8080/
 ```
+
+## Build del admin
+
+```bash
+cd web/admin
+corepack pnpm install
+corepack pnpm build
+```
+
+## CI
+
+El workflow en `.github/workflows/ci.yml` ejecuta:
+
+- `go vet ./...`
+- `go test ./...`
+- build backend
+- build admin
+- build Hugo
 
