@@ -3,6 +3,7 @@ import { useAuthStore } from '@/stores/auth'
 import LoginView from '@/views/Login.vue'
 import ArticulosView from '@/views/Articulos.vue'
 import ArticuloEditorView from '@/views/ArticuloEditor.vue'
+import AjustesView from '@/views/Ajustes.vue'
 
 export const router = createRouter({
   history: createWebHistory('/admin/'),
@@ -11,6 +12,7 @@ export const router = createRouter({
     { path: '/articulos', component: ArticulosView },
     { path: '/articulos/nuevo', component: ArticuloEditorView },
     { path: '/articulos/:slug/editar', component: ArticuloEditorView },
+    { path: '/ajustes', component: AjustesView },
     { path: '/', redirect: '/articulos' },
   ],
 })

@@ -15,6 +15,7 @@ import (
 	"github.com/awakeelectronik/diegonoticias/internal/builder"
 	"github.com/awakeelectronik/diegonoticias/internal/config"
 	"github.com/awakeelectronik/diegonoticias/internal/ratelimit"
+	"github.com/awakeelectronik/diegonoticias/internal/settings"
 )
 
 type Handler struct {
@@ -24,6 +25,7 @@ type Handler struct {
 	sitePublicDir string
 	builder       *builder.Builder
 	articleStore  *articles.Store
+	settingsStore *settings.Store
 	aiClient      *ai.Client
 	aiLimiter     *ratelimit.DailyLimiter
 }
@@ -46,6 +48,7 @@ func New(cfg config.Config) *Handler {
 		sitePublicDir: filepath.Join(siteDir, "public"),
 		builder:       builder.New(siteDir, cfg.HugoBin),
 		articleStore:  articles.NewStore(filepath.Join(siteDir, "content", "articulos")),
+		settingsStore: settings.New(filepath.Join(cfg.DataDir, "settings.json")),
 		aiClient:      ai.New(),
 		aiLimiter:     ratelimit.NewDailyLimiter(maxPerDay),
 	}
@@ -63,6 +66,8 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("PUT /admin/api/articulos/{slug}", h.csrfRequired(h.updateArticle))
 	mux.HandleFunc("DELETE /admin/api/articulos/{slug}", h.csrfRequired(h.deleteArticle))
 	mux.HandleFunc("POST /admin/api/articulos/generar", h.csrfRequired(h.generateArticle))
+	mux.HandleFunc("GET /admin/api/ajustes", h.authRequired(h.getSettings))
+	mux.HandleFunc("PUT /admin/api/ajustes", h.csrfRequired(h.updateSettings))
 
 	mux.Handle("GET /admin/", h.adminSPAHandler())
 	mux.Handle("GET /", h.publicSiteHandler())
