@@ -4,6 +4,8 @@ import LoginView from '@/views/Login.vue'
 import ArticulosView from '@/views/Articulos.vue'
 import ArticuloEditorView from '@/views/ArticuloEditor.vue'
 import AjustesView from '@/views/Ajustes.vue'
+import PublicidadView from '@/views/Publicidad.vue'
+import PublicidadEditorView from '@/views/PublicidadEditor.vue'
 
 export const router = createRouter({
   history: createWebHistory('/admin/'),
@@ -12,6 +14,9 @@ export const router = createRouter({
     { path: '/articulos', component: ArticulosView },
     { path: '/articulos/nuevo', component: ArticuloEditorView },
     { path: '/articulos/:slug/editar', component: ArticuloEditorView },
+    { path: '/publicidad', component: PublicidadView },
+    { path: '/publicidad/nueva', component: PublicidadEditorView },
+    { path: '/publicidad/:id/editar', component: PublicidadEditorView },
     { path: '/ajustes', component: AjustesView },
     { path: '/', redirect: '/articulos' },
   ],

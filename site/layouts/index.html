@@ -12,7 +12,10 @@
     </section>
   {{ end }}
   <div class="card-grid">
-    {{ range after 1 $p.Pages }}
+    {{ range $i, $page := after 1 $p.Pages }}
+      {{ if eq $i 4 }}
+        {{ partial "ad-slot.html" (dict "slot" 1) }}
+      {{ end }}
       {{ partial "article-card.html" . }}
     {{ end }}
   </div>

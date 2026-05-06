@@ -1,0 +1,20 @@
+{{- $slot := .slot -}}
+{{- $settings := site.Data.site -}}
+{{- if and $settings.adsense.enabled (eq $slot 1) $settings.adsense.slot1Enabled -}}
+  <div class="card" style="margin: 24px 0;">
+    <small>Espacio AdSense slot 1</small>
+  </div>
+{{- else if and $settings.adsense.enabled (eq $slot 2) $settings.adsense.slot2Enabled -}}
+  <div class="card" style="margin: 24px 0;">
+    <small>Espacio AdSense slot 2</small>
+  </div>
+{{- else -}}
+  {{- range site.Data.ads.banners -}}
+    {{- if eq .slot $slot -}}
+      <a class="card" style="display:block; margin:24px 0;" href="{{ .linkUrl }}" rel="sponsored noopener" target="_blank">
+        {{ partial "picture.html" (dict "base" .imagePath "alt" .title "loading" "lazy") }}
+      </a>
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+

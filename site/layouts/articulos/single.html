@@ -10,6 +10,7 @@
     <div class="prose prose-neutral max-w-none">
       {{ .Content }}
     </div>
+    {{ partial "ad-slot.html" (dict "slot" 2) }}
   </article>
 {{ end }}
 

@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/awakeelectronik/diegonoticias/internal/ai"
+	"github.com/awakeelectronik/diegonoticias/internal/ads"
 	"github.com/awakeelectronik/diegonoticias/internal/articles"
 	"github.com/awakeelectronik/diegonoticias/internal/auth"
 	"github.com/awakeelectronik/diegonoticias/internal/builder"
@@ -27,6 +28,7 @@ type Handler struct {
 	builder       *builder.Builder
 	articleStore  *articles.Store
 	settingsStore *settings.Store
+	adsStore      *ads.Store
 	imagePipeline *images.Pipeline
 	uploadsDir    string
 	aiClient      *ai.Client
@@ -49,9 +51,10 @@ func New(cfg config.Config) *Handler {
 		sessions:      auth.NewSessionManager(auth.SessionTTL()),
 		adminDistDir:  filepath.Join("web", "admin", "dist"),
 		sitePublicDir: filepath.Join(siteDir, "public"),
-		builder:       builder.New(siteDir, cfg.HugoBin),
+		builder:       builder.New(siteDir, cfg.DataDir, cfg.HugoBin),
 		articleStore:  articles.NewStore(filepath.Join(siteDir, "content", "articulos")),
 		settingsStore: settings.New(filepath.Join(cfg.DataDir, "settings.json")),
+		adsStore:      ads.New(filepath.Join(cfg.DataDir, "ads.json")),
 		imagePipeline: images.NewPipeline(images.Config{UploadsRoot: cfg.UploadsDir}),
 		uploadsDir:    cfg.UploadsDir,
 		aiClient:      ai.New(),
@@ -74,6 +77,10 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("POST /admin/api/imagenes", h.csrfRequired(h.uploadImage))
 	mux.HandleFunc("GET /admin/api/ajustes", h.authRequired(h.getSettings))
 	mux.HandleFunc("PUT /admin/api/ajustes", h.csrfRequired(h.updateSettings))
+	mux.HandleFunc("GET /admin/api/publicidad", h.authRequired(h.listAds))
+	mux.HandleFunc("POST /admin/api/publicidad", h.csrfRequired(h.createAd))
+	mux.HandleFunc("PUT /admin/api/publicidad/{id}", h.csrfRequired(h.updateAd))
+	mux.HandleFunc("DELETE /admin/api/publicidad/{id}", h.csrfRequired(h.deleteAd))
 
 	mux.Handle("GET /admin/", h.adminSPAHandler())
 	mux.Handle("GET /images/", h.imagesHandler())

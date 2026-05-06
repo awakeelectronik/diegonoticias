@@ -35,6 +35,7 @@ async function onDelete(slug: string) {
     <header class="mb-6 flex items-center justify-between">
       <h1 class="text-2xl font-semibold">Hola, {{ auth.username }}</h1>
       <div class="flex gap-2">
+        <router-link class="rounded-lg border border-neutral-300 px-4 py-2" to="/publicidad">Publicidad</router-link>
         <router-link class="rounded-lg border border-neutral-300 px-4 py-2" to="/ajustes">Ajustes</router-link>
         <router-link class="rounded-lg bg-neutral-900 px-4 py-2 text-white" to="/articulos/nuevo">Nuevo</router-link>
         <button class="rounded-lg border border-neutral-300 px-4 py-2" @click="onLogout">Cerrar sesión</button>
