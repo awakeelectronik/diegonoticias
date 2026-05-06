@@ -7,7 +7,11 @@
     {{ partial "head/og.html" . }}
     {{ partial "head/jsonld.html" . }}
     {{ $css := resources.Get "css/main.css" | minify | fingerprint }}
+    {{ $js := resources.Get "js/main.js" | minify | fingerprint }}
+    {{ $searchjs := resources.Get "js/search.js" | minify | fingerprint }}
     <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+    <script defer src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}"></script>
+    <script defer src="{{ $searchjs.RelPermalink }}" integrity="{{ $searchjs.Data.Integrity }}"></script>
   </head>
   <body>
     {{ partial "header.html" . }}

@@ -1,0 +1,15 @@
+name: Feature request
+description: Proponer mejora
+title: "feat: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivación
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Propuesta

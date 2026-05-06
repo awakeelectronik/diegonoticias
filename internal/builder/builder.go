@@ -26,15 +26,17 @@ type Builder struct {
 	siteDir   string
 	dataDir   string
 	hugoBin   string
+	pagefindBin string
 	mu        sync.Mutex
 	lastBuild BuildResult
 }
 
-func New(siteDir, dataDir, hugoBin string) *Builder {
+func New(siteDir, dataDir, hugoBin, pagefindBin string) *Builder {
 	return &Builder{
 		siteDir: siteDir,
 		dataDir: dataDir,
 		hugoBin: hugoBin,
+		pagefindBin: pagefindBin,
 	}
 }
 
@@ -62,6 +64,17 @@ func (b *Builder) Build() BuildResult {
 	if out, err := cmd.CombinedOutput(); err != nil {
 		res.Status = "error"
 		res.Error = fmt.Sprintf("%v: %s", err, string(out))
+		res.EndedAt = time.Now()
+		res.Duration = res.EndedAt.Sub(start)
+		b.lastBuild = res
+		return res
+	}
+	pagefindCmd := exec.Command(b.pagefindBin, "--site", "public")
+	pagefindCmd.Dir = b.siteDir
+	pagefindCmd.Env = os.Environ()
+	if out, err := pagefindCmd.CombinedOutput(); err != nil {
+		res.Status = "error"
+		res.Error = fmt.Sprintf("pagefind: %v: %s", err, string(out))
 	}
 	res.EndedAt = time.Now()
 	res.Duration = res.EndedAt.Sub(start)

@@ -51,7 +51,7 @@ func New(cfg config.Config) *Handler {
 		sessions:      auth.NewSessionManager(auth.SessionTTL()),
 		adminDistDir:  filepath.Join("web", "admin", "dist"),
 		sitePublicDir: filepath.Join(siteDir, "public"),
-		builder:       builder.New(siteDir, cfg.DataDir, cfg.HugoBin),
+		builder:       builder.New(siteDir, cfg.DataDir, cfg.HugoBin, cfg.PagefindBin),
 		articleStore:  articles.NewStore(filepath.Join(siteDir, "content", "articulos")),
 		settingsStore: settings.New(filepath.Join(cfg.DataDir, "settings.json")),
 		adsStore:      ads.New(filepath.Join(cfg.DataDir, "ads.json")),
