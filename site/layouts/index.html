@@ -8,7 +8,11 @@
         <p style="color:#4f4b47; max-width:52ch;">{{ .Params.description }}</p>
         <a style="display:inline-block; margin-top:14px; color:var(--color-accent); text-decoration:underline;" href="{{ .RelPermalink }}">Leer artículo</a>
       </div>
-      <div class="hero-visual"></div>
+      <div class="hero-visual">
+        {{ if .Params.image }}
+          {{ partial "picture.html" (dict "base" .Params.image "alt" .Params.imageAlt "loading" "eager" "priority" "high" "sizes" "(max-width: 900px) 100vw, 50vw") }}
+        {{ end }}
+      </div>
     </section>
   {{ end }}
   <div class="card-grid">

@@ -64,6 +64,7 @@ a {
   min-height: 280px;
   border-radius: 20px;
   background: linear-gradient(145deg, #1f2d26 0%, #365143 45%, #788b7d 100%);
+  overflow: hidden;
 }
 
 .card-grid {
@@ -78,6 +79,7 @@ a {
   border-radius: 18px;
   padding: 16px;
   border: 1px solid #ece6de;
+  box-shadow: 0 2px 10px rgba(35, 24, 14, 0.04);
 }
 
 .mobile-nav {
