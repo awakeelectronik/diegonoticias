@@ -58,11 +58,18 @@ article p {
   min-height: 56px;
 }
 
-.site-radio-player {
+.site-radio-wrap {
   width: 100%;
   max-width: 360px;
-  height: 36px;
   border-radius: 999px;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.site-radio-player {
+  display: block;
+  width: 100%;
+  height: 36px;
   outline: none;
 }
 
@@ -205,7 +212,7 @@ article p {
   .card-grid {
     grid-template-columns: 1fr;
   }
-  .site-radio-player {
+  .site-radio-wrap {
     max-width: 100%;
   }
 }
