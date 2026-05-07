@@ -44,10 +44,70 @@ article p {
 }
 
 .site-header-inner {
-  height: 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+  padding-bottom: 10px;
+}
+
+.site-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  min-height: 56px;
+}
+
+.site-radio {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  background: #fff;
+  border: 1px solid #ece6de;
+  border-radius: 999px;
+  box-shadow: 0 2px 10px rgba(35, 24, 14, 0.04);
+  flex-wrap: wrap;
+}
+
+.site-radio-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-fg);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.site-radio-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 0 rgba(200, 85, 61, 0.6);
+  animation: site-radio-pulse 1.6s ease-out infinite;
+}
+
+@keyframes site-radio-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(200, 85, 61, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(200, 85, 61, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(200, 85, 61, 0);
+  }
+}
+
+.site-radio-player {
+  flex: 1 1 240px;
+  min-width: 220px;
+  max-width: 380px;
+  height: 36px;
 }
 
 .brand {
@@ -84,9 +144,6 @@ article p {
 }
 
 .hero-visual {
-  min-height: 280px;
-  border-radius: 20px;
-  background: linear-gradient(145deg, #1f2d26 0%, #365143 45%, #788b7d 100%);
   overflow: hidden;
 }
 
@@ -103,6 +160,19 @@ article p {
   padding: 16px;
   border: 1px solid #ece6de;
   box-shadow: 0 2px 10px rgba(35, 24, 14, 0.04);
+}
+
+/* Publicidad: sin marco de tarjeta (evita “caja” blanca alrededor del creativo) */
+.card.card--ad {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  overflow: hidden;
+}
+
+.card.card--ad picture img {
+  border-radius: 0 !important;
 }
 
 .card:not(.card-grid .card) {
@@ -174,6 +244,13 @@ article p {
   }
   .card-grid {
     grid-template-columns: 1fr;
+  }
+  .site-radio {
+    justify-content: center;
+  }
+  .site-radio-player {
+    flex: 1 1 100%;
+    max-width: 100%;
   }
 }
 

@@ -1,17 +1,17 @@
 {{- $slot := .slot -}}
 {{- $settings := site.Data.site -}}
 {{- if and $settings.adsense.enabled (eq $slot 1) $settings.adsense.slot1Enabled -}}
-  <div class="card" style="margin: 24px 0;">
+  <div class="card card--ad" style="margin: 24px 0;">
     <small>Espacio AdSense slot 1</small>
   </div>
 {{- else if and $settings.adsense.enabled (eq $slot 2) $settings.adsense.slot2Enabled -}}
-  <div class="card" style="margin: 24px 0;">
+  <div class="card card--ad" style="margin: 24px 0;">
     <small>Espacio AdSense slot 2</small>
   </div>
 {{- else -}}
   {{- range site.Data.ads.banners -}}
     {{- if eq .slot $slot -}}
-      <div class="card" style="display:block; margin:24px 0;">
+      <div class="card card--ad" style="display:block; margin:24px 0;">
         {{ partial "picture.html" (dict "base" .imagePath "alt" .title "loading" "lazy") }}
       </div>
     {{- end -}}

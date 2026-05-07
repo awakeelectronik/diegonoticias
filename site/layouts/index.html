@@ -19,7 +19,7 @@
   {{ end }}
   <div class="card-grid">
     {{ range $i, $page := after 1 $p.Pages }}
-      {{ if eq $i 4 }}
+      {{ if eq $i 1 }}
         {{ partial "ad-slot.html" (dict "slot" 1) }}
       {{ end }}
       {{ partial "article-card.html" . }}

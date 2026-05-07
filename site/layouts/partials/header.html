@@ -1,8 +1,27 @@
 <header class="site-header">
   <div class="shell site-header-inner">
-    <a href="/" class="brand" aria-label="DIEGONOTICIAS — inicio">
-      <span class="brand-diego">DIEGO</span><span class="brand-noticias">NOTICIAS</span>
-    </a>
-    <a href="/admin/" class="text-sm">Admin</a>
+    <div class="site-header-row">
+      <a href="/" class="brand" aria-label="DIEGONOTICIAS — inicio">
+        <span class="brand-diego">DIEGO</span><span class="brand-noticias">NOTICIAS</span>
+      </a>
+      <a href="/admin/" class="text-sm">Admin</a>
+    </div>
+    <div class="site-radio" aria-label="Radio Cantar de los Andes en vivo">
+      <span class="site-radio-label">
+        <span class="site-radio-dot" aria-hidden="true"></span>
+        Radio Cantar de los Andes · en vivo
+      </span>
+      <audio
+        class="site-radio-player"
+        controls
+        preload="none"
+        controlslist="nodownload noplaybackrate noremoteplayback"
+        aria-label="Reproductor de Radio Cantar de los Andes"
+      >
+        <source src="https://radio25.virtualtronics.com/proxy/cantardelosandes?mp=/stream" type="audio/mpeg" />
+        <source src="http://62.210.38.137:8108/" type="audio/mpeg" />
+        Tu navegador no soporta la reproducción de audio en vivo.
+      </audio>
+    </div>
   </div>
 </header>
