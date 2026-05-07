@@ -14,3 +14,6 @@ body {
   @apply bg-neutral-50 text-neutral-900;
 }
 
+.card {
+  padding:0px;
+}

@@ -64,7 +64,7 @@ async function onSave() {
       <input v-model="form.title" placeholder="Título del banner" class="rounded-lg border border-neutral-300 px-3 py-2" />
       <select v-model.number="form.slot" class="rounded-lg border border-neutral-300 px-3 py-2">
         <option :value="1">Slot 1</option>
-        <option :value="2">Slot 2</option>
+        <option :value="2">Posición 2: Debajo del artículo</option>
       </select>
       <label class="inline-flex items-center gap-2">
         <input v-model="form.active" type="checkbox">
