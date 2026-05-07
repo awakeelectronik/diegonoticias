@@ -17,7 +17,6 @@ type Config struct {
 	UploadsDir string
 	SiteDir  string
 	HugoBin  string
-	PagefindBin string
 	LogLevel slog.Level
 }
 
@@ -51,10 +50,6 @@ func Load() (Config, error) {
 	if hugoBin == "" {
 		hugoBin = "hugo"
 	}
-	pagefindBin := strings.TrimSpace(os.Getenv("DN_PAGEFIND_BIN"))
-	if pagefindBin == "" {
-		pagefindBin = "pagefind"
-	}
 
 	levelStr := strings.TrimSpace(os.Getenv("DN_LOG_LEVEL"))
 	if levelStr == "" {
@@ -73,7 +68,6 @@ func Load() (Config, error) {
 		UploadsDir: uploadsDir,
 		SiteDir:  siteDir,
 		HugoBin:  hugoBin,
-		PagefindBin: pagefindBin,
 		LogLevel: level,
 	}, nil
 }

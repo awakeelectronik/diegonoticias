@@ -51,7 +51,7 @@ func New(cfg config.Config) *Handler {
 		sessions:      auth.NewSessionManager(auth.SessionTTL()),
 		adminDistDir:  filepath.Join("web", "admin", "dist"),
 		sitePublicDir: filepath.Join(siteDir, "public"),
-		builder:       builder.New(siteDir, cfg.DataDir, cfg.HugoBin, cfg.PagefindBin),
+		builder:       builder.New(siteDir, cfg.DataDir, cfg.HugoBin),
 		articleStore:  articles.NewStore(filepath.Join(siteDir, "content", "articulos")),
 		settingsStore: settings.New(filepath.Join(cfg.DataDir, "settings.json")),
 		adsStore:      ads.New(filepath.Join(cfg.DataDir, "ads.json")),
@@ -87,7 +87,7 @@ func (h *Handler) Routes() http.Handler {
 	mux.Handle("GET /", h.publicSiteHandler())
 	mux.Handle("GET /articulos/", h.publicSiteHandler())
 
-	return securityHeaders(loggingMiddleware(mux))
+	return securityHeaders(mux)
 }
 
 func (h *Handler) BuildInitialIfNeeded() error {
@@ -122,12 +122,6 @@ func writeJSON(w http.ResponseWriter, status int, body any) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(body)
-}
-
-func loggingMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		next.ServeHTTP(w, r)
-	})
 }
 
 func securityHeaders(next http.Handler) http.Handler {

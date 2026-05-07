@@ -32,13 +32,13 @@ async function onDelete(slug: string) {
 
 <template>
   <main class="min-h-screen p-6">
-    <header class="mb-6 flex items-center justify-between">
-      <h1 class="text-2xl font-semibold">Hola, {{ auth.username }}</h1>
-      <div class="flex gap-2">
-        <router-link class="rounded-lg border border-neutral-300 px-4 py-2" to="/publicidad">Publicidad</router-link>
-        <router-link class="rounded-lg border border-neutral-300 px-4 py-2" to="/ajustes">Ajustes</router-link>
-        <router-link class="rounded-lg bg-neutral-900 px-4 py-2 text-white" to="/articulos/nuevo">Nuevo</router-link>
-        <button class="rounded-lg border border-neutral-300 px-4 py-2" @click="onLogout">Cerrar sesión</button>
+    <header class="mb-6 grid gap-4 md:grid-cols-[auto_1fr] md:items-center">
+      <h1 class="text-2xl font-semibold leading-tight">Hola, {{ auth.username }}</h1>
+      <div class="grid grid-cols-2 gap-2 sm:grid-cols-4 md:justify-self-end">
+        <router-link class="inline-flex min-h-12 items-center justify-center rounded-lg border border-neutral-300 px-4 py-2 text-center" to="/publicidad">Publicidad</router-link>
+        <router-link class="inline-flex min-h-12 items-center justify-center rounded-lg border border-neutral-300 px-4 py-2 text-center" to="/ajustes">Ajustes</router-link>
+        <router-link class="inline-flex min-h-12 items-center justify-center rounded-lg bg-neutral-900 px-4 py-2 text-center text-white" to="/articulos/nuevo">Nuevo</router-link>
+        <button class="inline-flex min-h-12 items-center justify-center rounded-lg border border-neutral-300 px-4 py-2 text-center" @click="onLogout">Cerrar sesión</button>
       </div>
     </header>
     <section class="rounded-xl border border-neutral-200 bg-white p-6">

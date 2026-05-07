@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { createArticle, generateArticleSync, getArticle, updateArticle } from '@/api/articles'
+import { createArticle, generateArticle, getArticle, updateArticle } from '@/api/articles'
 import ImageUpload from '@/components/ImageUpload.vue'
 import { useAuthStore } from '@/stores/auth'
 
@@ -97,7 +97,7 @@ async function onGenerate() {
   justGenerated.value = false
   form.value.body = ''
   try {
-    const g = await generateArticleSync(
+    const g = await generateArticle(
       {
         rawText: rawText.value,
         tone: form.value.tone,

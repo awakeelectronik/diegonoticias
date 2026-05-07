@@ -53,11 +53,11 @@ export type GeneratedArticle = {
   imageAlt: string
 }
 
-export function generateArticleSync(
+export function generateArticle(
   payload: { rawText: string; tone: string; titleHint: string; hasImage: boolean },
   csrfToken: string,
 ) {
-  return apiFetch<GeneratedArticle>('/admin/api/articulos/generar?sync=1', {
+  return apiFetch<GeneratedArticle>('/admin/api/articulos/generar', {
     method: 'POST',
     headers: { 'X-CSRF-Token': csrfToken },
     body: JSON.stringify(payload),

@@ -4,7 +4,7 @@
     <section class="hero">
       <div>
         {{ with .Params.category }}
-          <p class="hero-category"><span class="hero-category-inner">{{ . }}</span></p>
+          <p class="hero-category">{{ . }}</p>
         {{ end }}
         <h2 style="font-size:46px; line-height:1.05; margin:10px 0 12px;">{{ .Title }}</h2>
         <p style="color:#4f4b47; max-width:52ch;">{{ .Params.description }}</p>

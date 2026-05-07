@@ -1,16 +1,12 @@
-<article class="card {{ if .Params.category }}card--tagged{{ end }}">
-  {{ with .Params.category }}
-    <div class="card-category-rail">
-      <span class="card-category-label">{{ . }}</span>
+<article class="card">
+  {{ if .Params.image }}
+    <div class="card-thumb">
+      {{ partial "picture.html" (dict "base" .Params.image "alt" .Params.imageAlt "sizes" "(max-width: 900px) 100vw, 33vw") }}
     </div>
   {{ end }}
-  <div class="card-main">
-    {{ if .Params.image }}
-      <div class="card-thumb">
-        {{ partial "picture.html" (dict "base" .Params.image "alt" .Params.imageAlt "sizes" "(max-width: 900px) 100vw, 33vw") }}
-      </div>
-    {{ end }}
-    <h3 class="card-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
-    <p class="card-excerpt">{{ .Params.description }}</p>
-  </div>
+  {{ with .Params.category }}
+    <p class="card-category">{{ . }}</p>
+  {{ end }}
+  <h3 class="card-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+  <p class="card-excerpt">{{ .Params.description }}</p>
 </article>

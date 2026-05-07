@@ -7,7 +7,7 @@ Sitio minimalista de noticias con:
 
 ## Requisitos (dev)
 
-- Go 1.23+
+- Go 1.25+
 - Node 22+
 - Hugo extended 0.140+
 
