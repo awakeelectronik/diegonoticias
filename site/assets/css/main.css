@@ -100,9 +100,13 @@ article p {
 .card {
   background: #fff;
   border-radius: 18px;
-  padding: 0px;
+  padding: 16px;
   border: 1px solid #ece6de;
   box-shadow: 0 2px 10px rgba(35, 24, 14, 0.04);
+}
+
+.card:not(.card-grid .card) {
+  padding: 0px;
 }
 
 .card-thumb {
