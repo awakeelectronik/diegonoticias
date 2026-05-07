@@ -239,7 +239,6 @@ diegonoticias/
 │   │   │   │   └── jsonld.html
 │   │   │   ├── header.html
 │   │   │   ├── footer.html
-│   │   │   ├── mobile-nav.html
 │   │   │   ├── article-card.html
 │   │   │   ├── article-card-hero.html
 │   │   │   ├── ad-slot.html
@@ -605,7 +604,7 @@ ogDefault = "/og-default.jpg"
 
 ### 8.2 Layouts (responsabilidades)
 
-- **`_default/baseof.html`**: HTML5 esqueleto con `<head>` (incluye partials de meta, og, jsonld), body con `<header>`, `<main>{{ block "main" . }}{{ end }}</main>`, `<footer>`, mobile-nav.
+- **`_default/baseof.html`**: HTML5 esqueleto con `<head>` (incluye partials de meta, og, jsonld), body con `<header>`, `<main>{{ block "main" . }}{{ end }}</main>` y `<footer>`.
 - **`index.html`**: home. Hero con el artículo más reciente (tarjeta grande), grid de tarjetas para los siguientes, slot de publicidad intercalado entre el 5to y 6to artículo, paginación al final.
 - **`_default/list.html`**: fallback para listados (categoría, tag — aunque no usemos categorías como página, Hugo las genera por defecto).
 - **`articulos/single.html`**: artículo individual (header, imagen hero, título, meta, body Markdown renderizado, slot de publicidad después del 2do párrafo, sugeridos al final).
@@ -616,7 +615,6 @@ ogDefault = "/og-default.jpg"
 - **`partials/head/jsonld.html`**: `Article` + `BreadcrumbList` + `WebSite` (con `SearchAction`).
 - **`partials/header.html`**: barra superior con logo (texto), botón buscar (abre overlay).
 - **`partials/footer.html`**: créditos, link RSS, link sitemap.
-- **`partials/mobile-nav.html`**: bottom nav con 3 ítems (Inicio, Buscar, Admin).
 - **`partials/search.html`**: overlay con input y resultados de Pagefind.
 - **`partials/pagination.html`**: paginación de Hugo personalizada.
 - **`404.html`**: página 404 con link al home.
@@ -1724,7 +1722,7 @@ Ejemplo: `fase 4: implementar CRUD de artículos en admin SPA`.
 - Refinar todos los `site/layouts/**/*.html`.
 - `site/assets/css/main.css` con tokens de diseño.
 - `site/assets/js/search.js` con cliente Pagefind.
-- `site/layouts/partials/{mobile-nav,search,article-card-hero}.html`.
+- `site/layouts/partials/{search,article-card-hero}.html`.
 - Builder: integrar `pagefind --site site/public`.
 
 **Tareas**:

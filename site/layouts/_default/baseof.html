@@ -12,11 +12,10 @@
   </head>
   <body>
     {{ partial "header.html" . }}
-    <main class="shell" style="padding-top: 8px; padding-bottom: 90px;">
+    <main class="shell" style="padding-top: 8px;">
       {{ block "main" . }}{{ end }}
     </main>
     {{ partial "footer.html" . }}
-    {{ partial "mobile-nav.html" . }}
   </body>
 </html>
 

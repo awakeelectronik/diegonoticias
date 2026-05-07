@@ -96,7 +96,6 @@ site/                      # proyecto Hugo
       head/{meta,og,jsonld}.html
       header.html          # brand DIEGO+NOTICIAS + link Admin
       footer.html          # SVG inline RRSS (FB/IG/X) + copy
-      mobile-nav.html      # bottom-nav: Inicio · Admin (2 items)
       article-card.html    # tarjeta con thumb + categoría
       ad-slot.html         # AdSense > banner propio > vacío
       picture.html         # <picture> AVIF+WebP × 4 anchos
@@ -380,7 +379,7 @@ Cargadas con `godotenv` solo en `DN_ENV=development`. Defaults entre paréntesis
 ## 16. Decisiones removidas frente al plan original
 
 - **Streaming SSE de IA**: el plan lo declaraba como decisión cerrada; el editor usa generación síncrona. Handler SSE y composable cliente fueron eliminados.
-- **Buscador Pagefind**: removido del sitio público (UI, partial, JS, link en mobile-nav, SearchAction de JSON-LD) y del builder.
+- **Buscador Pagefind**: removido del sitio público (UI, partial, JS y SearchAction de JSON-LD) y del builder.
 - **Tests**: el plan exigía tests de slug, prompt e imágenes; se prescindió de ellos a favor de QA manual.
 
 ---
