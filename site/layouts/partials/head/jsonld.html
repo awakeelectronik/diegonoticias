@@ -16,12 +16,7 @@
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "Diego Noticias",
-  "url": {{ .Site.BaseURL | jsonify }},
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": {{ (printf "%s#search" .Site.BaseURL) | jsonify }},
-    "query-input": "required name=search_term_string"
-  }
+  "url": {{ .Site.BaseURL | jsonify }}
 }
 </script>
 {{ end }}

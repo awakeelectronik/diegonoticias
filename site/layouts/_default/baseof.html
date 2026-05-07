@@ -8,13 +8,10 @@
     {{ partial "head/jsonld.html" . }}
     <meta name="theme-color" content="#f4f1ec">
     {{ $css := resources.Get "css/main.css" | minify | fingerprint }}
-    {{ $searchjs := resources.Get "js/search.js" | minify | fingerprint }}
     <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
-    <script defer src="{{ $searchjs.RelPermalink }}" integrity="{{ $searchjs.Data.Integrity }}"></script>
   </head>
   <body>
     {{ partial "header.html" . }}
-    {{ partial "search.html" . }}
     <main class="shell" style="padding-top: 8px; padding-bottom: 90px;">
       {{ block "main" . }}{{ end }}
     </main>
