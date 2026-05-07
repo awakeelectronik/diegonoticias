@@ -1,18 +1,40 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { deleteArticle, listArticles, type Article } from '@/api/articles'
+import { getSettings } from '@/api/settings'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
 const router = useRouter()
 const items = ref<Article[]>([])
 const error = ref('')
+const homeHref = ref('/')
+
+const displayUsername = computed(() => {
+  const u = auth.username
+  if (!u) return ''
+  return u.charAt(0).toUpperCase() + u.slice(1)
+})
+
+function resolveHomeHref(siteUrl: string | undefined): string {
+  const raw = siteUrl?.trim()
+  if (!raw) return '/'
+  try {
+    return new URL(raw).href
+  } catch {
+    return '/'
+  }
+}
 
 onMounted(async () => {
   try {
-    const data = await listArticles()
+    const [data, settings] = await Promise.all([
+      listArticles(),
+      getSettings().catch(() => null),
+    ])
     items.value = data.items
+    homeHref.value = resolveHomeHref(settings?.siteUrl)
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'No se pudo cargar'
   }
@@ -33,7 +55,17 @@ async function onDelete(slug: string) {
 <template>
   <main class="min-h-screen p-6">
     <header class="mb-6 grid gap-4 md:grid-cols-[auto_1fr] md:items-center">
-      <h1 class="text-2xl font-semibold leading-tight">Hola, {{ auth.username }}</h1>
+      <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <h1 class="text-2xl font-semibold leading-tight">Hola, {{ displayUsername }}</h1>
+        <a
+          :href="homeHref"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex min-h-10 shrink-0 items-center rounded-lg border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-900 hover:bg-neutral-50"
+        >
+          Ver página
+        </a>
+      </div>
       <div class="grid grid-cols-2 gap-2 sm:grid-cols-4 md:justify-self-end">
         <router-link class="inline-flex min-h-12 items-center justify-center rounded-lg border border-neutral-300 px-4 py-2 text-center" to="/publicidad">Publicidad</router-link>
         <router-link class="inline-flex min-h-12 items-center justify-center rounded-lg border border-neutral-300 px-4 py-2 text-center" to="/ajustes">Ajustes</router-link>

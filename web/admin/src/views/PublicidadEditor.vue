@@ -63,7 +63,7 @@ async function onSave() {
     <div class="grid gap-4 rounded-xl border border-neutral-200 bg-white p-6">
       <input v-model="form.title" placeholder="Título del banner" class="rounded-lg border border-neutral-300 px-3 py-2" />
       <select v-model.number="form.slot" class="rounded-lg border border-neutral-300 px-3 py-2">
-        <option :value="1">Slot 1</option>
+        <option :value="1">Posición 1: Entre el artículo 2 y 3 del inicio</option>
         <option :value="2">Posición 2: Debajo del artículo</option>
       </select>
       <label class="inline-flex items-center gap-2">
