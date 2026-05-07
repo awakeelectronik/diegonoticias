@@ -61,7 +61,7 @@ func (c *Client) Stream(ctx context.Context, p GenerateParams, onDelta func(stri
 		},
 		"response_format": map[string]string{"type": "json_object"},
 		"temperature":     0.7,
-		"max_tokens":      1024,
+		"max_tokens":      2048,
 		"stream":          true,
 	}
 	payload, _ := json.Marshal(body)
@@ -143,7 +143,7 @@ func (c *Client) Complete(ctx context.Context, p GenerateParams) (string, error)
 		},
 		"response_format": map[string]string{"type": "json_object"},
 		"temperature":     0.7,
-		"max_tokens":      1024,
+		"max_tokens":      2048,
 		"stream":          false,
 	}
 	payload, _ := json.Marshal(body)
