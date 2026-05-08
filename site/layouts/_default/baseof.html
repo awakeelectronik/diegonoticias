@@ -3,9 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="preconnect" href="https://radio25.virtualtronics.com" crossorigin>
     {{ partial "head/meta.html" . }}
     {{ partial "head/og.html" . }}
     {{ partial "head/jsonld.html" . }}
+    <link rel="alternate" type="application/rss+xml" title="Diego Noticias" href="/index.xml">
     <meta name="theme-color" content="#f4f1ec">
     {{ $css := resources.Get "css/main.css" | minify | fingerprint }}
     <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">

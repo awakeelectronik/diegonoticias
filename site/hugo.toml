@@ -8,6 +8,11 @@ summaryLength = 30
 [permalinks]
 articulos = "/:slug/"
 
+[params]
+defaultAuthor = "Diego Rodríguez"
+defaultDescription = "Noticias breves y al grano."
+defaultOgImage = "/og-default.jpg"
+
 [markup.goldmark.renderer]
 unsafe = true
 

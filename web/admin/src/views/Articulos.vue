@@ -54,14 +54,14 @@ async function onDelete(slug: string) {
 
 <template>
   <main class="min-h-screen p-6">
-    <header class="mb-6 grid gap-4 md:grid-cols-[auto_1fr] md:items-center">
-      <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+    <header class="mb-6 grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+      <div class="flex w-full min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-2">
         <h1 class="text-2xl font-semibold leading-tight">Hola, {{ displayUsername }}</h1>
         <a
           :href="homeHref"
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex min-h-10 shrink-0 items-center rounded-lg border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-900 hover:bg-neutral-50"
+          class="inline-flex shrink-0 items-center rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-bold lowercase text-white hover:bg-neutral-800"
         >
           Ver página
         </a>

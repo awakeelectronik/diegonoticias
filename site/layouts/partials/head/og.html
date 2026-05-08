@@ -1,14 +1,30 @@
-{{ $title := cond .IsHome "Diego Noticias" (printf "%s · Diego Noticias" .Title) }}
-{{ $desc := .Params.description | default "Noticias breves y al grano." }}
-{{ $image := .Params.image | default "/og-default.jpg" }}
+{{- $title := cond .IsHome "Diego Noticias — Noticias breves y al grano" (printf "%s · Diego Noticias" .Title) -}}
+{{- $defaultDesc := site.Params.defaultDescription | default "Noticias breves y al grano." -}}
+{{- $desc := .Params.description -}}
+{{- if not $desc -}}
+  {{- if and .IsPage .Summary -}}
+    {{- $desc = .Summary | plainify | chomp -}}
+  {{- end -}}
+{{- end -}}
+{{- if not $desc -}}{{- $desc = $defaultDesc -}}{{- end -}}
+{{- $imagePath := site.Params.defaultOgImage | default "/og-default.jpg" -}}
+{{- if .Params.image -}}{{- $imagePath = printf "%s-1024.webp" .Params.image -}}{{- end -}}
+{{- $imageURL := $imagePath | absURL -}}
+{{- $imageAlt := .Params.imageAlt | default (cond .IsHome "Diego Noticias" (printf "%s — Diego Noticias" .Title)) -}}
 <meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
+<meta property="og:locale" content="es_CO">
 <meta property="og:site_name" content="Diego Noticias">
 <meta property="og:title" content="{{ $title }}">
 <meta property="og:description" content="{{ $desc }}">
 <meta property="og:url" content="{{ .Permalink }}">
-<meta property="og:image" content="{{ $image }}">
+<meta property="og:image" content="{{ $imageURL }}">
+<meta property="og:image:alt" content="{{ $imageAlt }}">
+{{ with .Params.imageWidth }}<meta property="og:image:width" content="{{ . }}">
+{{ end -}}
+{{ with .Params.imageHeight }}<meta property="og:image:height" content="{{ . }}">
+{{ end -}}
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ $title }}">
 <meta name="twitter:description" content="{{ $desc }}">
-<meta name="twitter:image" content="{{ $image }}">
-
+<meta name="twitter:image" content="{{ $imageURL }}">
+<meta name="twitter:image:alt" content="{{ $imageAlt }}">

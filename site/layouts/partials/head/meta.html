@@ -1,3 +1,26 @@
-<title>{{ if .IsHome }}Diego Noticias{{ else }}{{ .Title }} · Diego Noticias{{ end }}</title>
-<meta name="description" content="{{ with .Params.description }}{{ . }}{{ else }}Noticias breves y al grano.{{ end }}">
+{{- $defaultDesc := site.Params.defaultDescription | default "Noticias breves y al grano." -}}
+{{- $desc := .Params.description -}}
+{{- if not $desc -}}
+  {{- if and .IsPage .Summary -}}
+    {{- $desc = .Summary | plainify | chomp -}}
+  {{- end -}}
+{{- end -}}
+{{- if not $desc -}}
+  {{- if .IsHome -}}
+    {{- $desc = printf "Diego Noticias — %s" $defaultDesc -}}
+  {{- else if .Title -}}
+    {{- $desc = printf "%s — Diego Noticias." .Title -}}
+  {{- else -}}
+    {{- $desc = $defaultDesc -}}
+  {{- end -}}
+{{- end -}}
+{{- $author := .Params.author | default site.Params.defaultAuthor -}}
+{{- $isPaginated := and .RelPermalink (in .RelPermalink "/page/") -}}
+{{- $isEmptyTaxonomy := and (or (eq .Kind "taxonomy") (eq .Kind "term")) (eq (len .Pages) 0) -}}
+{{- $noindex := or (eq .Kind "404") $isPaginated $isEmptyTaxonomy -}}
+<title>{{ if .IsHome }}Diego Noticias — Noticias breves y al grano{{ else }}{{ .Title }} · Diego Noticias{{ end }}</title>
+<meta name="description" content="{{ $desc }}">
+{{ if .IsPage }}<meta name="author" content="{{ $author }}">
+{{ end -}}
 <link rel="canonical" href="{{ .Permalink }}">
+{{ if $noindex }}<meta name="robots" content="noindex,follow">{{ end }}

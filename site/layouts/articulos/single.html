@@ -1,6 +1,10 @@
 {{ define "main" }}
+  {{ $author := .Params.author | default site.Params.defaultAuthor }}
   <article class="mx-auto max-w-3xl">
-    <p class="mb-2 text-sm text-neutral-500">{{ .Date.Format "02 Jan 2006" }}</p>
+    <p class="mb-2 text-sm text-neutral-500">
+      Por <span class="font-medium">{{ $author }}</span> ·
+      <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "02 Jan 2006" }}</time>
+    </p>
     <h1 class="mb-6 text-4xl font-semibold">{{ .Title }}</h1>
     {{ if .Params.image }}
       <div style="margin-bottom:20px;">
