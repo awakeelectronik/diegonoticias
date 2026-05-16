@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
+	"runtime/debug"
 	"sync"
 	"time"
 
@@ -70,6 +72,16 @@ func (b *Builder) Build() BuildResult {
 	res.EndedAt = time.Now()
 	res.Duration = res.EndedAt.Sub(start)
 	b.lastBuild = res
+
+	// Forzar devolución de memoria al OS después del build de Hugo.
+	// Hugo puede consumir cientos de MB que Go retiene en su heap;
+	// FreeOSMemory los devuelve inmediatamente sin esperar al próximo GC.
+	go func() {
+		time.Sleep(2 * time.Second)
+		runtime.GC()
+		debug.FreeOSMemory()
+	}()
+
 	return res
 }
 
@@ -125,4 +137,3 @@ func writeToml(path string, v any) error {
 	defer f.Close()
 	return toml.NewEncoder(f).Encode(v)
 }
-

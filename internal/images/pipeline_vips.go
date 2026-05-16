@@ -11,6 +11,9 @@ import (
 )
 
 func processWithVips(input []byte, diskBase string, cfg Config) error {
+	// Inicializar vips de forma lazy: solo la primera vez que se sube una imagen.
+	EnsureVips()
+
 	img, err := vips.NewImageFromBuffer(input)
 	if err != nil {
 		return fmt.Errorf("decode image: %w", err)
@@ -73,4 +76,3 @@ var (
 	osWriteFile = func(path string, content []byte) error { return os.WriteFile(path, content, 0o644) }
 	osRename    = os.Rename
 )
-

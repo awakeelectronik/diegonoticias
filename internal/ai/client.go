@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 type GenerateParams struct {
@@ -32,7 +33,7 @@ func New() *Client {
 	return &Client{
 		apiKey: strings.TrimSpace(os.Getenv("GROQ_API_KEY")),
 		model:  model,
-		http:   &http.Client{Timeout: 0},
+		http:   &http.Client{Timeout: 30 * time.Second},
 	}
 }
 
@@ -124,4 +125,3 @@ func toneDescription(tone string) string {
 		return "neutral"
 	}
 }
-
