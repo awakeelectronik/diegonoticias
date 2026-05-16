@@ -85,28 +85,41 @@ article p {
 }
 
 .brand {
+  display: inline-block;
   font-size: 34px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1;
 }
 
-.brand-diego,
-.brand-noticias {
-  color: #fff;
-  display: inline-block;
-  padding: 0.12em 0.28em;
+/* Inclinación uniforme del wordmark y de la frontera azul/rojo (skew, no imagen). */
+.brand-mark {
+  display: inline-flex;
+  align-items: stretch;
+  transform: skewX(-12deg);
 }
 
-.brand-diego {
-  font-weight: 700;
+.brand-blue,
+.brand-o,
+.brand-red {
+  color: #fff;
+  padding: 0.12em 0;
+}
+
+.brand-blue {
   background: #9ec5e8;
   border-radius: 6px 0 0 6px;
+  padding-left: 0.28em;
 }
 
-.brand-noticias {
+.brand-o {
+  background: linear-gradient(90deg, #9ec5e8 50%, #f0a8a8 50%);
+}
+
+.brand-red {
   background: #f0a8a8;
   border-radius: 0 6px 6px 0;
+  padding-right: 0.28em;
 }
 
 .hero {
