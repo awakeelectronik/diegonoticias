@@ -3,6 +3,8 @@
   --color-fg: #1a1a1a;
   --color-muted: #6b6b6b;
   --color-accent: #c8553d;
+  --brand-blue: #6d98ce;
+  --brand-red: #e36c6c;
 }
 
 * {
@@ -92,34 +94,19 @@ article p {
   line-height: 1;
 }
 
-/* Inclinación uniforme del wordmark y de la frontera azul/rojo (skew, no imagen). */
+/* Un solo fondo evita rayas; corte ~centro de la O. scaleY alarga sin ensanchar. */
 .brand-mark {
-  display: inline-flex;
-  align-items: stretch;
-  transform: skewX(-12deg);
-}
-
-.brand-blue,
-.brand-o,
-.brand-red {
+  display: inline-block;
+  transform: skewX(-12deg) scaleY(1.2);
+  transform-origin: left center;
   color: #fff;
-  padding: 0.12em 0;
-}
-
-.brand-blue {
-  background: #9ec5e8;
-  border-radius: 6px 0 0 6px;
-  padding-left: 0.28em;
-}
-
-.brand-o {
-  background: linear-gradient(90deg, #9ec5e8 50%, #f0a8a8 50%);
-}
-
-.brand-red {
-  background: #f0a8a8;
-  border-radius: 0 6px 6px 0;
-  padding-right: 0.28em;
+  padding: 0.12em 0.28em;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    var(--brand-blue) calc(0.28em + 6.5ch),
+    var(--brand-red) calc(0.28em + 6.5ch)
+  );
 }
 
 .hero {
