@@ -28,6 +28,10 @@ const form = ref({
 const bodyParagraphs = computed(() => form.value.body.split(/\n\s*\n/).filter(Boolean))
 const wordCount = computed(() => form.value.body.trim().split(/\s+/).filter(Boolean).length)
 const canSave = computed(() => !!form.value.title.trim() && !!form.value.body.trim() && !saving.value)
+// El alt no se pide: se usa el título, que es lo que el autor ya escribió.
+const imageAltForUpload = computed(
+  () => form.value.imageAlt?.trim() || form.value.title.trim() || 'Imagen de la noticia',
+)
 
 function onImagePathUpdate(path: string) {
   form.value.image = path
@@ -78,6 +82,7 @@ async function onSave() {
     // `date` va solo si el artículo ya la tiene: el backend no acepta cadena vacía
     // y, al editar, reenviarla evita que la publicación cambie de fecha.
     const payload: Article = { ...form.value }
+    if (payload.image && !payload.imageAlt?.trim()) payload.imageAlt = payload.title.trim()
     if (!payload.date) delete payload.date
     if (isEdit.value) {
       await updateArticle(String(route.params.slug), payload, auth.csrfToken)
@@ -124,8 +129,9 @@ async function onSave() {
       </div>
 
       <ImageUpload
+        hide-alt-field
         :image-path="form.image"
-        :image-alt="form.imageAlt"
+        :image-alt="imageAltForUpload"
         @update:imagePath="onImagePathUpdate"
         @update:imageAlt="onImageAltUpdate"
       />
@@ -142,20 +148,6 @@ async function onSave() {
         <datalist id="categorias-existentes">
           <option v-for="c in categories" :key="c" :value="c" />
         </datalist>
-      </div>
-
-      <div class="grid gap-1">
-        <label class="text-sm text-neutral-600" for="descripcion">
-          Descripción para Google (opcional)
-        </label>
-        <textarea
-          id="descripcion"
-          v-model="form.description"
-          rows="2"
-          placeholder="Resumen de 1 o 2 frases. Si lo dejas vacío se toma del primer párrafo."
-          class="rounded-lg border border-neutral-300 px-3 py-2"
-        />
-        <p class="text-xs text-neutral-500">{{ form.description.length }} caracteres · ideal 140-160</p>
       </div>
 
       <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
@@ -181,14 +173,8 @@ async function onSave() {
           Vista previa · {{ wordCount }} palabras · categoría: {{ form.category || '—' }}
         </p>
         <h2 class="mb-2 text-xl font-semibold">{{ form.title || '(sin título)' }}</h2>
-        <p v-if="form.description" class="mb-3 text-sm italic text-neutral-600">
-          {{ form.description }}
-        </p>
         <p v-for="(p, i) in bodyParagraphs" :key="i" class="mb-3 leading-relaxed text-neutral-800">
           {{ p }}
-        </p>
-        <p v-if="form.imageAlt" class="mt-3 text-xs text-neutral-500">
-          Alt de imagen: "{{ form.imageAlt }}"
         </p>
       </article>
     </div>
