@@ -11,7 +11,7 @@ Sitio de noticias minimalista en español (es-CO) con dos piezas en un solo bina
 - **Sitio público**: estático, generado por Hugo. Servido por el binario en `127.0.0.1:8080` detrás de nginx (TLS + compresión).
 - **Admin SPA**: Vue 3 + TS + Pinia + Tailwind v4, embebida vía `go:embed` y montada en `/admin/`. CRUD de artículos, publicidad y ajustes.
 
-Flujo central: el admin pega un texto crudo + escoge tono → backend llama a Groq y devuelve un JSON `{title, body, metaDescription, category, imageAlt}` → el admin lo edita si quiere → al guardar se escribe el `.md` y se dispara `hugo --minify`.
+Flujo central: el admin escribe título + cuerpo (Markdown) + imagen + categoría → al guardar se escribe el `.md` y se dispara `hugo --minify`. **La generación por IA fue retirada** (2026-09-05): el dueño del sitio redacta todo a mano.
 
 ---
 

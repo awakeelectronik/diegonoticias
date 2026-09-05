@@ -44,23 +44,3 @@ export function deleteArticle(slug: string, csrfToken: string) {
     headers: { 'X-CSRF-Token': csrfToken },
   })
 }
-
-export type GeneratedArticle = {
-  title: string
-  body: string
-  metaDescription: string
-  category: string
-  imageAlt: string
-}
-
-export function generateArticle(
-  payload: { rawText: string; tone: string; titleHint: string; hasImage: boolean },
-  csrfToken: string,
-) {
-  return apiFetch<GeneratedArticle>('/admin/api/articulos/generar', {
-    method: 'POST',
-    headers: { 'X-CSRF-Token': csrfToken },
-    body: JSON.stringify(payload),
-  })
-}
-

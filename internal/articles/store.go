@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -77,6 +78,9 @@ func (s *Store) Create(a *Article) error {
 	if a.Date.IsZero() {
 		a.Date = time.Now()
 	}
+	if strings.TrimSpace(a.Description) == "" {
+		a.Description = DeriveDescription(a.Body)
+	}
 	a.WordCount = len(strings.Fields(a.Body))
 	return s.writeFile(a.Slug, a)
 }
@@ -90,6 +94,9 @@ func (s *Store) Update(slug string, a *Article) error {
 	}
 	if a.Date.IsZero() {
 		a.Date = time.Now()
+	}
+	if strings.TrimSpace(a.Description) == "" {
+		a.Description = DeriveDescription(a.Body)
 	}
 	a.WordCount = len(strings.Fields(a.Body))
 	if err := s.writeFile(a.Slug, a); err != nil {
@@ -127,3 +134,29 @@ func (s *Store) writeFile(slug string, a *Article) error {
 	return os.Rename(tmp, dst)
 }
 
+
+var (
+	mdLink  = regexp.MustCompile(`\[([^\]]*)\]\([^)]*\)`)
+	mdNoise = regexp.MustCompile("[#*_`>]")
+)
+
+// DeriveDescription arma una meta description desde el cuerpo cuando el autor no
+// escribió una: primer párrafo en texto plano, recortado a ~160 caracteres.
+func DeriveDescription(body string) string {
+	first := strings.TrimSpace(body)
+	if i := strings.Index(first, "\n\n"); i > 0 {
+		first = first[:i]
+	}
+	first = mdLink.ReplaceAllString(first, "$1")
+	first = mdNoise.ReplaceAllString(first, "")
+	first = strings.Join(strings.Fields(first), " ")
+	r := []rune(first)
+	if len(r) <= 160 {
+		return first
+	}
+	cut := string(r[:160])
+	if i := strings.LastIndex(cut, " "); i > 80 {
+		cut = cut[:i]
+	}
+	return strings.TrimRight(cut, " ,.;:") + "…"
+}

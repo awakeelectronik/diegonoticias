@@ -6,17 +6,14 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
-	"github.com/awakeelectronik/diegonoticias/internal/ai"
 	"github.com/awakeelectronik/diegonoticias/internal/ads"
 	"github.com/awakeelectronik/diegonoticias/internal/articles"
 	"github.com/awakeelectronik/diegonoticias/internal/auth"
 	"github.com/awakeelectronik/diegonoticias/internal/builder"
 	"github.com/awakeelectronik/diegonoticias/internal/config"
 	"github.com/awakeelectronik/diegonoticias/internal/images"
-	"github.com/awakeelectronik/diegonoticias/internal/ratelimit"
 	"github.com/awakeelectronik/diegonoticias/internal/settings"
 )
 
@@ -31,20 +28,12 @@ type Handler struct {
 	adsStore      *ads.Store
 	imagePipeline *images.Pipeline
 	uploadsDir    string
-	aiClient      *ai.Client
-	aiLimiter     *ratelimit.DailyLimiter
 }
 
 func New(cfg config.Config) *Handler {
 	siteDir := cfg.SiteDir
 	if siteDir == "" {
 		siteDir = "./site"
-	}
-	maxPerDay := 100
-	if raw := strings.TrimSpace(os.Getenv("GROQ_MAX_PER_DAY")); raw != "" {
-		if n, err := strconv.Atoi(raw); err == nil && n > 0 {
-			maxPerDay = n
-		}
 	}
 	return &Handler{
 		adminFilePath: filepath.Join(cfg.DataDir, "admin.json"),
@@ -57,8 +46,6 @@ func New(cfg config.Config) *Handler {
 		adsStore:      ads.New(filepath.Join(cfg.DataDir, "ads.json")),
 		imagePipeline: images.NewPipeline(images.Config{UploadsRoot: cfg.UploadsDir}),
 		uploadsDir:    cfg.UploadsDir,
-		aiClient:      ai.New(),
-		aiLimiter:     ratelimit.NewDailyLimiter(maxPerDay),
 	}
 }
 
@@ -73,7 +60,6 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("POST /admin/api/articulos", h.csrfRequired(h.createArticle))
 	mux.HandleFunc("PUT /admin/api/articulos/{slug}", h.csrfRequired(h.updateArticle))
 	mux.HandleFunc("DELETE /admin/api/articulos/{slug}", h.csrfRequired(h.deleteArticle))
-	mux.HandleFunc("POST /admin/api/articulos/generar", h.csrfRequired(h.generateArticle))
 	mux.HandleFunc("POST /admin/api/imagenes", h.csrfRequired(h.uploadImage))
 	mux.HandleFunc("GET /admin/api/ajustes", h.authRequired(h.getSettings))
 	mux.HandleFunc("PUT /admin/api/ajustes", h.csrfRequired(h.updateSettings))
