@@ -52,7 +52,6 @@ internal/
     middleware.go          # authRequired, csrfRequired (cookie + header X-CSRF-Token)
     auth.go                # POST /login, GET /me, POST /logout
     articles.go            # CRUD artículos (dispara builder.Build() en cada mutación)
-    ai.go                  # POST /articulos/generar (síncrono; cap diario via DailyLimiter)
     images.go              # POST /imagenes (multipart, máx 8MB)
     ads.go                 # CRUD banners
     settings.go            # GET/PUT ajustes
@@ -68,10 +67,7 @@ internal/
     slug.go                # GenerateSlug con gosimple/slug, manejo de colisiones
     store.go               # List/Get/Create/Update/Delete sobre site/content/articulos/*.md
                            # escritura atómica (.tmp + rename), parse con adrg/frontmatter
-  ai/
-    client.go              # Groq client. Complete() (sync). Modelo:
-                           #   llama-3.3-70b-versatile. response_format=json_object.
-    prompt.go              # plantilla text/template del prompt + tabla de tonos
+                           # DeriveDescription: meta desde el 1er párrafo si viene vacía
   ads/
     store.go               # CRUD sobre data/ads.json
     validate.go            # reglas: total ≤7, máx 2 activos, máx 1 activo por slot,
@@ -82,7 +78,6 @@ internal/
     pipeline_vips.go       # build tag `vips`: govips → 4 anchos × {avif, webp}
     pipeline_stub.go       # build sin tag: error claro
     runtime_vips.go        # vips.Startup MaxCacheSize/Mem=0 (RAM mínima)
-  ratelimit/ratelimit.go   # DailyLimiter (cap diario IA, default 100, env GROQ_MAX_PER_DAY)
   settings/store.go        # CRUD data/settings.json (siteName, siteUrl, twitter, AdSense)
 
 site/                      # proyecto Hugo
@@ -139,7 +134,6 @@ static-uploads/            # gitignored, runtime
 | Sitio público | Hugo extended, Markdown + YAML frontmatter |
 | CSS sitio | CSS plano con tokens (no Tailwind) |
 | Admin | Vue 3.5 + TS + Vite + Pinia + Vue Router + Tailwind v4 (`@tailwindcss/vite`) |
-| IA | Groq, modelo `llama-3.3-70b-versatile`, `response_format: json_object` |
 | Imágenes | govips (libvips) → AVIF (Q55) + WebP (Q72) en 320/640/1024/1600 |
 | Auth | Argon2id (`alexedwards/argon2id`) + cookie HttpOnly SameSite=Strict + CSRF header |
 | Frontmatter | `adrg/frontmatter` + `gopkg.in/yaml.v2` |
@@ -160,7 +154,7 @@ title: "El ritual del objeto"
 slug: "el-ritual-del-objeto"
 date: 2026-05-05T18:00:00-05:00
 description: "..."          # meta description, 140-160 chars
-tone: "conversacional"      # uno de los 10 tonos cerrados
+tone: "conversacional"      # legado: vacío en los artículos nuevos
 category: "design"          # palabra libre devuelta por la IA
 image: "/images/2026/05/abcd1234"   # opcional, basePath sin sufijo
 imageAlt: "..."             # opcional
@@ -216,7 +210,6 @@ Todos bajo `/admin/api/*`. JSON. Auth por cookie `dn_session`. Mutaciones requie
 | POST | `/articulos` | CSRF | crear (auto-slug si vacío, rebuild) |
 | PUT | `/articulos/{slug}` | CSRF | actualizar (rename si cambia slug, rebuild) |
 | DELETE | `/articulos/{slug}` | CSRF | borrar (rebuild) |
-| POST | `/articulos/generar` | CSRF | IA síncrona, devuelve JSON `{title, body, metaDescription, category, imageAlt}` |
 | POST | `/imagenes` | CSRF | multipart `image` + `alt`, devuelve `{basePath, alt}` |
 | GET | `/ajustes` | sesión | leer settings |
 | PUT | `/ajustes` | CSRF | guardar settings (NO dispara rebuild) |
@@ -232,21 +225,16 @@ Headers de seguridad globales: `X-Content-Type-Options`, `Referrer-Policy: stric
 ## 7. Flujo de creación de artículo
 
 1. Admin entra a `/admin/articulos/nuevo`.
-2. Pega texto crudo en textarea, escoge tono, opcionalmente sube imagen y escribe título-hint.
-3. Clic en **Generar** → `POST /admin/api/articulos/generar` → backend:
-   - Verifica cap diario (`DailyLimiter`).
-   - Construye prompt desde plantilla (`prompt.go`), incluye tono + descripción + título-hint + flag hasImage.
-   - Llama a Groq con `stream: false`, `response_format: json_object`.
-   - Parsea JSON. Si `len(words(body)) < 150`, reintenta UNA vez añadiendo nota interna pidiendo 180-230 palabras. Devuelve la versión más larga.
-4. Admin recibe `{title, body, metaDescription, category, imageAlt}`, edita lo que quiera en la preview.
-5. Clic en **Guardar** → `POST /admin/api/articulos`:
+2. Escribe título y cuerpo (Markdown), sube imagen y elige categoría. Solo eso: el formulario no pide alt ni meta description.
+3. Clic en **Publicar** → `POST /admin/api/articulos`:
    - Genera slug con `gosimple/slug` (es), trunca a 80, resuelve colisiones con sufijo `-2`, `-3`...
+   - `imageAlt` vacío → toma el título (lo pone el SPA). `description` vacía → `DeriveDescription` la saca del primer párrafo.
    - `wordCount` recalculado.
    - Escritura atómica del `.md` (`.tmp` + rename).
    - `builder.Build()`: exporta TOML derivados, corre `hugo --minify` (build con mutex global).
-6. Sitio público actualizado.
+4. Sitio público actualizado.
 
-**Falla bien**: sin `GROQ_API_KEY`, error en español devuelto al admin sin perder el `rawText`.
+Al **editar**, el SPA reenvía la `date` original: la fecha de publicación no se reescribe con la del momento.
 
 ---
 
@@ -295,7 +283,7 @@ Guard global: si no hay sesión, redirige a `/login`. Si hay sesión y va a `/lo
 
 Store `auth` (Pinia) mantiene `username`, `csrfToken`, `checked`. Llama a `GET /me` en boot.
 
-Vista `ArticuloEditor.vue`: textarea de texto crudo, select de tono (10 opciones), `ImageUpload`, botones **Generar** / **Guardar** / **Cancelar**. Preview en tarjeta debajo con conteo de palabras y categoría. Anillo verde tras generar exitoso.
+Vista `ArticuloEditor.vue`: título, cuerpo (Markdown, con contador de palabras), `ImageUpload` sin campo de alt, categoría con `datalist` de las ya usadas. Botones **Publicar** / **Cancelar** y preview en tarjeta debajo.
 
 `ImageUpload.vue` muestra preview vía `/images/{basePath}-640.webp` y reporta errores si las variantes no se generaron en el VPS.
 
@@ -351,7 +339,12 @@ cd web/admin && pnpm install && pnpm build   # genera dist/ (committed)
 - Build inicial de Hugo se dispara al arrancar el binario si `site/public/index.html` no existe.
 - Cada mutación admin invoca `builder.Build()` (mutex global, ~ms en sitios pequeños).
 - nginx delante del binario hace TLS, gzip/brotli y reverse-proxy.
-- No hay Dockerfile, ni `scripts/deploy.sh`, ni unit systemd en el repo. Despliegue es manual al VPS.
+- No hay Dockerfile, ni `scripts/deploy.sh`, ni unit systemd en el repo. Despliegue manual al VPS, con esta forma:
+  1. En el VPS hay un clone del repo aparte del directorio de producción: se hace `git pull` en el clone.
+  2. `CGO_ENABLED=1 go build -tags vips -o diegonoticias ./cmd/server` en el clone (el VPS tiene Go y libvips; no tiene Node, así que `web/admin/dist` se compila en local y viaja commiteado).
+  3. Se copian a producción **solo** el binario y `web/admin/dist/`; si cambiaron plantillas, también `site/layouts` y `site/assets`.
+  4. `systemctl restart diegonoticias` (solo si cambió el binario: el `dist` se sirve desde disco) y `hugo --minify` si se tocaron plantillas.
+- **`site/content/` y `data/` de producción son la fuente de verdad y NO están en git**: las noticias reales, la publicidad y los ajustes viven solo en el VPS. Un deploy que copie `site/` entero encima los destruye.
 
 ---
 
@@ -368,9 +361,6 @@ Cargadas con `godotenv` solo en `DN_ENV=development`. Defaults entre paréntesis
 | `DN_SITE_DIR` | `./site` | proyecto Hugo |
 | `DN_HUGO_BIN` | `hugo` | binario Hugo |
 | `DN_LOG_LEVEL` | `info` | debug/info/warn/error |
-| `GROQ_API_KEY` | — | requerido para IA |
-| `GROQ_MODEL` | `llama-3.3-70b-versatile` | modelo |
-| `GROQ_MAX_PER_DAY` | `100` | cap diario de generaciones |
 | `DN_SETUP_USERNAME` | — | batch setup-admin |
 | `DN_SETUP_PASSWORD` | — | batch setup-admin |
 
@@ -381,6 +371,7 @@ Cargadas con `godotenv` solo en `DN_ENV=development`. Defaults entre paréntesis
 - **Streaming SSE de IA**: el plan lo declaraba como decisión cerrada; el editor usa generación síncrona. Handler SSE y composable cliente fueron eliminados.
 - **Buscador Pagefind**: removido del sitio público (UI, partial, JS y SearchAction de JSON-LD) y del builder.
 - **Tests**: el plan exigía tests de slug, prompt e imágenes; se prescindió de ellos a favor de QA manual.
+- **Generación por IA (Groq)**: retirada el 2026-09-05. El endpoint `/articulos/generar` devolvía 502 y el dueño del sitio prefiere redactar a mano. Se eliminaron `internal/ai`, `internal/ratelimit`, el handler y el botón. El `tone` sobrevive en el frontmatter de los artículos viejos, pero ya no se usa ni se pide.
 
 ---
 
